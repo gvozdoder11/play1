@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#041016">
+<title>Эволюция — Миры</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;
+    font-family:'Segoe UI',Arial,sans-serif;user-select:none;-webkit-user-select:none}
+  html,body{width:100%;height:100%;overflow:hidden;background:#041016;color:#fff;
+    touch-action:none;overscroll-behavior:none}
+
+  .app{position:relative;width:100%;height:100%;display:flex;flex-direction:column;
+    max-width:600px;margin:0 auto;padding:10px;z-index:10}
+
+  /* ===== ФОН ===== */
+  .world-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+    transition:background 1.5s ease}
+
+  /* ОКЕАН */
+  .world-bg.water{background:linear-gradient(180deg,#0a4d6e 0%,#062c44 25%,#031a2a 60%,#010a12 100%)}
+  .world-bg.water::before{content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(120,220,255,.35) 0%,transparent 70%);
+    animation:lightShift 8s ease-in-out infinite}
+
+  /* ОСТРОВ */
+  .world-bg.earth{background:linear-gradient(180deg,#4a9fd4 0%,#6bc0e8 25%,#a0daf5 45%,#ffffff 55%,#ffffff 100%)}
+  .world-bg.earth::before{content:'';position:absolute;
+    top:42%;left:0;right:0;height:12%;
+    background:linear-gradient(180deg,#00b8c8 0%,#00a0b0 40%,#008a99 70%,#006e7a 100%)}
+  .world-bg.earth::after{content:'';position:absolute;
+    top:53%;left:0;right:0;height:2px;background:rgba(255,255,255,.6);filter:blur(1px)}
+
+  /* ГОРОД */
+  .world-bg.city{background:linear-gradient(180deg,#1a2540 0%,#2a3a5c 20%,#3d4f75 45%,#5a4a70 70%,#2a1f3a 100%)}
+  .world-bg.city::before{content:'';position:absolute;
+    top:10%;right:15%;width:60px;height:60px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%,#fff8d0 0%,#e8dca0 60%,#a89860 100%);
+    box-shadow:0 0 40px rgba(255,240,180,.6),0 0 80px rgba(255,240,180,.3)}
+  .world-bg.city::after{content:'';position:absolute;
+    top:0;left:0;right:0;height:50%;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%,#fff,transparent),
+      radial-gradient(1px 1px at 25% 8%,#fff,transparent),
+      radial-gradient(1px 1px at 40% 20%,#fff,transparent),
+      radial-gradient(1px 1px at 60% 12%,#fff,transparent),
+      radial-gradient(1px 1px at 75% 25%,#fff,transparent),
+      radial-gradient(1px 1px at 88% 5%,#fff,transparent);
+    opacity:.8}
+  .city-buildings{position:absolute;bottom:0;left:0;right:0;height:65%;
+    background:linear-gradient(180deg,#0a1428 0%,#050a15 100%);
+    clip-path:polygon(
+      0% 100%,0% 55%,3% 55%,3% 40%,6% 40%,6% 60%,9% 60%,9% 25%,12% 25%,12% 45%,
+      15% 45%,15% 55%,18% 55%,18% 35%,21% 35%,21% 50%,24% 50%,24% 20%,27% 20%,
+      27% 45%,30% 45%,30% 60%,33% 60%,33% 30%,36% 30%,36% 50%,39% 50%,39% 15%,
+      42% 15%,42% 40%,45% 40%,45% 55%,48% 55%,48% 25%,51% 25%,51% 50%,54% 50%,
+      54% 35%,57% 35%,57% 55%,60% 55%,60% 20%,63% 20%,63% 45%,66% 45%,66% 30%,
+      69% 30%,69% 55%,72% 55%,72% 40%,75% 40%,75% 25%,78% 25%,78% 50%,81% 50%,
+      81% 60%,84% 60%,84% 35%,87% 35%,87% 45%,90% 45%,90% 55%,93% 55%,93% 30%,
+      96% 30%,96% 50%,100% 50%,100% 100%)}
+  .city-windows{position:absolute;bottom:0;left:0;right:0;height:65%;
+    background-image:
+      radial-gradient(circle 1.5px at 4% 45%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 7% 50%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 10% 30%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 13% 42%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 16% 48%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 22% 28%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 28% 40%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 34% 22%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 40% 30%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 46% 45%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 52% 28%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 58% 42%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 64% 25%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 70% 38%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 76% 22%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 82% 40%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 88% 30%,#ffe480,transparent),
+      radial-gradient(circle 1.5px at 94% 45%,#ffe480,transparent);
+    opacity:.7;mix-blend-mode:screen;animation:windowsTwinkle 4s ease-in-out infinite}
+  @keyframes windowsTwinkle{0%,100%{opacity:.7}50%{opacity:.9}}
+  .city-road{position:absolute;bottom:0;left:0;right:0;height:22%;
+    background:linear-gradient(180deg,#1a1a24 0%,#0a0a10 100%)}
+  .city-road::after{content:'';position:absolute;
+    top:20%;left:10%;right:10%;height:2px;
+    background:repeating-linear-gradient(90deg,#ffe480 0 20px,transparent 20px 40px);
+    opacity:.5}
+  .lamp{position:absolute;bottom:22%;width:3px;height:60px;
+    background:linear-gradient(180deg,#3a3a4a,#1a1a2a);z-index:2}
+  .lamp::after{content:'';position:absolute;bottom:-8px;left:50%;
+    transform:translateX(-50%);width:20px;height:12px;
+    background:radial-gradient(ellipse,rgba(255,220,100,.9) 0%,transparent 70%);
+    filter:blur(2px)}
+  .lamp.l1{left:18%;bottom:20%}
+  .lamp.l2{right:18%;bottom:20%}
+  .lamp.l3{left:50%;bottom:18%;transform:translateX(-50%)}
+
+  /* ЛУНА + КОСМОС (для киборга) */
+  .world-bg.moon-cosmos{
+    background:
+      radial-gradient(ellipse at 70% 15%, rgba(180,180,220,.25) 0%, transparent 45%),
+      radial-gradient(ellipse at 20% 80%, rgba(120,80,200,.35) 0%, transparent 55%),
+      linear-gradient(180deg,#0a0618 0%,#150a30 30%,#1a0d3d 55%,#0a0418 100%)}
+  /* Звёздное небо */
+  .moon-cosmos .stars{
+    position:absolute;inset:0;
+    background-image:
+      radial-gradient(1.5px 1.5px at 8% 12%,#fff,transparent),
+      radial-gradient(1px 1px at 22% 5%,#fff,transparent),
+      radial-gradient(1.5px 1.5px at 45% 18%,#fff,transparent),
+      radial-gradient(1px 1px at 62% 8%,#fff,transparent),
+      radial-gradient(1.5px 1.5px at 78% 22%,#fff,transparent),
+      radial-gradient(1px 1px at 92% 15%,#fff,transparent),
+      radial-gradient(1px 1px at 15% 28%,#fff,transparent),
+      radial-gradient(1.5px 1.5px at 55% 3%,#fff,transparent),
+      radial-gradient(1px 1px at 35% 35%,#fff,transparent),
+      radial-gradient(1px 1px at 85% 42%,#fff,transparent),
+      radial-gradient(1.5px 1.5px at 12% 55%,#fff,transparent),
+      radial-gradient(1px 1px at 70% 60%,#fff,transparent),
+      radial-gradient(1px 1px at 40% 70%,#fff,transparent),
+      radial-gradient(1.5px 1.5px at 90% 75%,#fff,transparent),
+      radial-gradient(1px 1px at 5% 88%,#fff,transparent),
+      radial-gradient(1px 1px at 60% 90%,#fff,transparent);
+    animation:starsTwinkle 4s ease-in-out infinite}
+  @keyframes starsTwinkle{0%,100%{opacity:.85}50%{opacity:1}}
+  /* Луна большая */
+  .moon-cosmos .moon-big{
+    position:absolute;top:8%;right:8%;
+    width:110px;height:110px;border-radius:50%;
+    background:
+      radial-gradient(circle at 30% 25%, #f5f5ff 0%, #d8d8ec 40%, #a0a0bc 75%, #707090 100%);
+    box-shadow:
+      0 0 60px rgba(200,200,255,.7),
+      0 0 120px rgba(150,150,220,.4),
+      inset -12px -12px 30px rgba(80,80,110,.7);
+    animation:moonGlow 5s ease-in-out infinite}
+  @keyframes moonGlow{
+    0%,100%{box-shadow:0 0 60px rgba(200,200,255,.7),0 0 120px rgba(150,150,220,.4),inset -12px -12px 30px rgba(80,80,110,.7)}
+    50%{box-shadow:0 0 80px rgba(200,200,255,.9),0 0 160px rgba(150,150,220,.5),inset -12px -12px 30px rgba(80,80,110,.7)}}
+  /* Кратеры на луне */
+  .moon-craters{
+    position:absolute;border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, rgba(80,80,110,.9) 0%, rgba(50,50,80,.95) 100%);
+    box-shadow:inset 2px 2px 4px rgba(40,40,60,.9)}
+  /* Туманность */
+  .nebula{
+    position:absolute;bottom:0;left:0;right:0;height:60%;
+    background:
+      radial-gradient(ellipse at 30% 100%, rgba(120,60,220,.45) 0%, transparent 55%),
+      radial-gradient(ellipse at 75% 100%, rgba(60,140,255,.35) 0%, transparent 55%),
+      radial-gradient(ellipse at 50% 90%, rgba(200,80,180,.25) 0%, transparent 45%)}
+  /* Маленькая планета на горизонте */
+  .planet-small{
+    position:absolute;bottom:8%;left:10%;
+    width:70px;height:70px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #7b5cff 0%, #4520a0 60%, #1a0a40 100%);
+    box-shadow:0 0 40px rgba(120,80,255,.7),inset -8px -8px 20px rgba(0,0,0,.6)}
+  .planet-ring{
+    position:absolute;bottom:6%;left:6%;
+    width:80px;height:22px;border-radius:50%;
+    border:2px solid rgba(180,150,255,.5);
+    transform:rotate(-20deg);pointer-events:none}
+
+  /* ПЛАНЕТА КСЕН (для инопланетянина) */
+  .world-bg.alien{
+    background:
+      radial-gradient(ellipse at 50% 100%, rgba(60,180,90,.35) 0%, transparent 60%),
+      linear-gradient(180deg,#0a2a15 0%,#061a0d 40%,#021008 70%,#010502 100%)}
+  .world-bg.alien::before{content:'';position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 15% 20%,rgba(100,255,100,.4) 0%,transparent 25%),
+      radial-gradient(circle at 85% 30%,rgba(80,200,120,.35) 0%,transparent 30%),
+      radial-gradient(circle at 50% 70%,rgba(60,180,100,.2) 0%,transparent 40%)}
+  .alien-mushrooms{position:absolute;bottom:0;left:0;right:0;height:35%;
+    background:
+      radial-gradient(ellipse 8px 25px at 12% 90%,rgba(150,255,150,.7) 0%,transparent 100%),
+      radial-gradient(ellipse 10px 35px at 25% 95%,rgba(100,255,180,.6) 0%,transparent 100%),
+      radial-gradient(ellipse 7px 22px at 65% 92%,rgba(150,255,150,.7) 0%,transparent 100%),
+      radial-gradient(ellipse 12px 30px at 82% 94%,rgba(120,255,160,.6) 0%,transparent 100%),
+      radial-gradient(ellipse 9px 28px at 45% 96%,rgba(130,255,140,.65) 0%,transparent 100%)}
+  .alien-planet{
+    position:absolute;top:12%;left:70%;width:70px;height:70px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 35%,#9dff9d 0%,#3aa93a 60%,#0a3a0a 100%);
+    box-shadow:0 0 60px rgba(120,255,120,.7)}
+  /* Зелёная туманность сверху */
+  .alien-mist{
+    position:absolute;top:0;left:0;right:0;height:40%;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(100,255,150,.3) 0%, transparent 60%)}
+
+  /* БОСС — ТЁМНАЯ ЗОНА */
+  .world-bg.boss{
+    background:
+      radial-gradient(ellipse at 50% 20%, rgba(255,60,60,.35) 0%, transparent 50%),
+      linear-gradient(180deg,#2a0505 0%,#150202 40%,#0a0101 70%,#030000 100%)}
+  .world-bg.boss::before{content:'';position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 50% 20%,rgba(255,60,60,.4) 0%,transparent 40%),
+      radial-gradient(circle at 20% 60%,rgba(255,40,40,.25) 0%,transparent 40%),
+      radial-gradient(circle at 80% 70%,rgba(255,80,40,.2) 0%,transparent 40%)}
+  .world-bg.boss::after{content:'';position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 30% 80%,rgba(255,0,0,.3) 0%,transparent 30%),
+      radial-gradient(circle at 70% 30%,rgba(255,80,0,.25) 0%,transparent 30%);
+    animation:bossPulse 2s ease-in-out infinite}
+  @keyframes bossPulse{0%,100%{opacity:.7}50%{opacity:1}}
+  .boss-ship{
+    position:absolute;top:10%;left:50%;transform:translateX(-50%);
+    width:120px;height:60px;
+    background:radial-gradient(ellipse at 50% 30%,#a03030 0%,#501010 70%,#200505 100%);
+    border-radius:50% 50% 20% 20%;
+    box-shadow:0 0 60px rgba(255,60,60,.8),inset 0 -10px 20px rgba(0,0,0,.7)}
+  .boss-ship::before{content:'';position:absolute;bottom:-15px;left:50%;transform:translateX(-50%);
+    width:100%;height:15px;border-radius:50%;
+    background:radial-gradient(ellipse,rgba(255,100,0,.9) 0%,rgba(255,0,0,.5) 50%,transparent 100%);
+    animation:shipGlow 1s ease-in-out infinite}
+  @keyframes shipGlow{0%,100%{opacity:.7;transform:translateX(-50%) scaleY(1)}
+    50%{opacity:1;transform:translateX(-50%) scaleY(1.3)}}
+  /* Красные звёзды */
+  .boss-stars{
+    position:absolute;inset:0;pointer-events:none;
+    background-image:
+      radial-gradient(1.5px 1.5px at 12% 15%,#ff6666,transparent),
+      radial-gradient(1px 1px at 28% 8%,#ff8080,transparent),
+      radial-gradient(1.5px 1.5px at 55% 22%,#ff5050,transparent),
+      radial-gradient(1px 1px at 72% 5%,#ff7070,transparent),
+      radial-gradient(1.5px 1.5px at 88% 18%,#ff6060,transparent),
+      radial-gradient(1px 1px at 5% 42%,#ff7070,transparent),
+      radial-gradient(1.5px 1.5px at 95% 38%,#ff5050,transparent),
+      radial-gradient(1px 1px at 30% 55%,#ff6060,transparent);}
+
+  /* БОЖЕСТВО */
+  .world-bg.divine{background:linear-gradient(180deg,#fff9e6 0%,#ffe8a0 30%,#ffcc66 60%,#cc8800 100%)}
+  .world-bg.divine::before{content:'';position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 50% 30%,rgba(255,255,255,.9) 0%,transparent 30%),
+      radial-gradient(circle at 20% 60%,rgba(255,240,180,.6) 0%,transparent 30%),
+      radial-gradient(circle at 80% 50%,rgba(255,240,180,.6) 0%,transparent 30%)}
+
+  .ray{position:absolute;top:-100px;width:80px;height:120vh;
+    background:linear-gradient(180deg,rgba(255,255,240,.2) 0%,transparent 70%);
+    transform-origin:top center;animation:rayMove 12s ease-in-out infinite;
+    filter:blur(8px);pointer-events:none}
+  .ray:nth-child(1){left:15%;animation-delay:0s;transform:rotate(-8deg)}
+  .ray:nth-child(2){left:40%;animation-delay:-4s;transform:rotate(3deg);width:120px}
+  .ray:nth-child(3){left:70%;animation-delay:-8s;transform:rotate(10deg);width:100px}
+  @keyframes rayMove{0%,100%{opacity:.4}50%{opacity:.8}}
+  @keyframes lightShift{0%,100%{opacity:.8;transform:translateX(-5%)}
+    50%{opacity:1;transform:translateX(5%)}}
+
+  .bubble{position:absolute;bottom:-50px;border-radius:50%;
+    background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.8),rgba(200,220,255,.3) 40%,transparent 70%);
+    border:1px solid rgba(200,240,255,.4);
+    animation:bubbleUp linear infinite;opacity:.7}
+  @keyframes bubbleUp{
+    0%{transform:translateY(0) translateX(0) scale(.6);opacity:0}
+    10%{opacity:.8}
+    50%{transform:translateY(-50vh) translateX(20px) scale(1)}
+    90%{opacity:.6}
+    100%{transform:translateY(-110vh) translateX(-20px) scale(1.1);opacity:0}}
+
+  .particle{position:absolute;pointer-events:none;
+    animation:particleFloat linear infinite;opacity:.7;font-size:14px;z-index:5}
+  @keyframes particleFloat{
+    0%{transform:translateY(100vh) translateX(0) rotate(0deg);opacity:0}
+    10%{opacity:.8}
+    90%{opacity:.8}
+    100%{transform:translateY(-20vh) translateX(50px) rotate(360deg);opacity:0}}
+
+  .top{display:flex;justify-content:space-between;align-items:center;gap:6px;
+    padding:10px 12px;background:rgba(5,25,45,.75);backdrop-filter:blur(12px);
+    border-radius:14px;border:1px solid rgba(100,200,255,.35);flex-shrink:0;
+    box-shadow:0 4px 20px rgba(0,150,200,.2)}
+  .res{font-size:10px;color:#a8c8e0;text-transform:uppercase;letter-spacing:1px;
+    flex:1;text-align:center}
+  .res b{display:block;font-size:16px;color:#fff;margin-top:2px;font-weight:900;
+    text-shadow:0 0 10px rgba(100,200,255,.5)}
+  .res b.gold{color:#ffcc00;text-shadow:0 0 10px rgba(255,204,0,.6)}
+
+  .evolution-bar{flex-shrink:0;margin-top:8px;
+    background:rgba(5,25,45,.85);backdrop-filter:blur(12px);
+    border-radius:14px;border:1px solid rgba(100,200,255,.5);
+    padding:10px 14px;box-shadow:0 4px 20px rgba(0,150,200,.3);
+    position:relative;overflow:hidden}
+  .evolution-bar::before{content:'';position:absolute;inset:0;
+    background:linear-gradient(90deg,transparent,rgba(100,220,255,.1),transparent);
+    animation:shimmer 2.5s infinite;pointer-events:none}
+  @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+  .evo-header{display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:8px;font-size:11px;color:#a8c8e0;
+    text-transform:uppercase;letter-spacing:1px;font-weight:800;position:relative;z-index:1}
+  .evo-header .stage-name{color:#5fd4ff;font-size:12px;
+    text-shadow:0 0 10px rgba(100,220,255,.6)}
+  .evo-header .next-name{color:#ffcc00;font-size:11px;
+    text-shadow:0 0 10px rgba(255,204,0,.5)}
+  .evo-header .timer{color:#ff6b6b;font-size:13px;font-weight:900;
+    text-shadow:0 0 10px rgba(255,100,100,.8)}
+  .evo-track{height:18px;background:rgba(0,10,20,.8);border-radius:10px;
+    overflow:hidden;position:relative;
+    border:1px solid rgba(100,200,255,.3);z-index:1}
+  .evo-fill{height:100%;border-radius:10px;
+    background:linear-gradient(90deg,#00d9ff,#00ff88,#ffcc00);
+    transition:width .25s ease-out;
+    box-shadow:0 0 20px rgba(0,255,136,.6);position:relative;width:0%}
+  .evo-fill::after{content:'';position:absolute;inset:0;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);
+    animation:shine 2s infinite}
+  @keyframes shine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+  .evo-text{position:absolute;inset:0;display:flex;align-items:center;
+    justify-content:center;font-size:11px;font-weight:900;color:#fff;
+    text-shadow:0 1px 3px rgba(0,0,0,.9);z-index:2;pointer-events:none}
+
+  .evolution-zone{flex:1;position:relative;display:flex;align-items:center;
+    justify-content:center;min-height:0;padding:20px;overflow:hidden}
+  .main-creature{position:absolute;top:50%;left:50%;
+    width:200px;height:200px;cursor:pointer;z-index:15;
+    transform:translate(-50%,-50%);
+    transition:width .4s ease-out,height .4s ease-out;
+    animation:breathe 3.5s ease-in-out infinite;
+    filter:drop-shadow(0 10px 25px rgba(0,0,0,.5))}
+  .main-creature svg{width:100%;height:100%;display:block;pointer-events:none}
+  @keyframes breathe{0%,100%{transform:translate(-50%,-50%) scale(1)}
+    50%{transform:translate(-50%,-50%) scale(1.06)}}
+  .creature-name{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);
+    background:rgba(5,25,45,.9);border:1px solid rgba(100,200,255,.6);
+    padding:6px 18px;border-radius:20px;font-size:13px;font-weight:800;
+    color:#fff;white-space:nowrap;z-index:20;backdrop-filter:blur(8px);
+    text-shadow:0 0 12px rgba(100,220,255,.8)}
+
+  .combo-indicator{position:absolute;top:20px;left:50%;transform:translateX(-50%);
+    background:linear-gradient(90deg,#ff6b00,#ffcc00);color:#1a0b00;
+    padding:6px 18px;border-radius:20px;font-weight:900;font-size:14px;
+    z-index:25;opacity:0;transition:opacity .3s;pointer-events:none;
+    box-shadow:0 0 30px rgba(255,150,0,.7)}
+  .combo-indicator.active{opacity:1;animation:comboPulse .5s infinite}
+  @keyframes comboPulse{0%,100%{transform:translateX(-50%) scale(1)}
+    50%{transform:translateX(-50%) scale(1.08)}}
+  .big-bonus{position:absolute;font-size:36px;font-weight:900;color:#ff3b9a;
+    pointer-events:none;z-index:30;text-shadow:0 0 30px rgba(255,59,154,.9);
+    animation:bigBonusAnim 1.2s ease-out forwards}
+  @keyframes bigBonusAnim{
+    0%{transform:translate(-50%,-50%) scale(.3) rotate(0deg);opacity:0}
+    20%{transform:translate(-50%,-70%) scale(1.5) rotate(-10deg);opacity:1}
+    100%{transform:translate(-50%,-250%) scale(1) rotate(20deg);opacity:0}}
+  .flash{position:absolute;font-size:22px;font-weight:900;color:#ffcc00;
+    pointer-events:none;z-index:30;text-shadow:0 0 20px rgba(255,204,0,.9);
+    animation:floatUp .8s ease-out forwards}
+  @keyframes floatUp{0%{transform:translate(-50%,-50%) scale(.5);opacity:0}
+    20%{transform:translate(-50%,-70%) scale(1.3);opacity:1}
+    100%{transform:translate(-50%,-200%) scale(1);opacity:0}}
+  .click-bubble{position:absolute;width:20px;height:20px;border-radius:50%;
+    background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.9),rgba(150,220,255,.3));
+    border:1px solid rgba(200,240,255,.6);pointer-events:none;z-index:12;
+    animation:clickBubbleUp 1s ease-out forwards}
+  @keyframes clickBubbleUp{
+    0%{transform:translate(-50%,-50%) scale(.3);opacity:1}
+    100%{transform:translate(-50%,-300%) scale(1.5);opacity:0}}
+  .event-toast{position:absolute;top:70px;left:50%;transform:translateX(-50%) translateY(-30px);
+    background:linear-gradient(90deg,rgba(20,20,50,.95),rgba(40,20,80,.95));
+    border:2px solid;padding:10px 20px;border-radius:14px;
+    font-weight:800;font-size:13px;z-index:40;opacity:0;
+    transition:opacity .4s,transform .4s;pointer-events:none;
+    max-width:90%;text-align:center;backdrop-filter:blur(10px)}
+  .event-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .mutations{display:flex;gap:8px;margin-bottom:8px;flex-shrink:0}
+  .mut-btn{flex:1;padding:11px 6px;border-radius:12px;border:none;
+    font-weight:800;font-size:11px;cursor:pointer;text-transform:uppercase;
+    transition:filter .2s;color:#fff}
+  .mut-btn:disabled{opacity:.4;cursor:not-allowed}
+  .mut-btn:not(:disabled):hover{filter:brightness(1.1)}
+  .mut-btn .icon{font-size:18px;display:block;margin-bottom:2px}
+  .mut-1{background:linear-gradient(160deg,#ff9500,#ffcc00);color:#2a1200;
+    box-shadow:0 4px 15px rgba(255,150,0,.4)}
+  .mut-2{background:linear-gradient(160deg,#00d9ff,#0088cc);color:#001a2a;
+    box-shadow:0 4px 15px rgba(0,200,255,.4)}
+  .mut-3{background:linear-gradient(160deg,#ff3b9a,#cc0077);color:#fff;
+    box-shadow:0 4px 15px rgba(255,60,150,.4)}
+
+  .tabs{display:flex;gap:6px;margin-bottom:8px;flex-shrink:0}
+  .tab{flex:1;padding:9px 4px;border-radius:12px;
+    border:1px solid rgba(100,200,255,.35);
+    background:rgba(5,25,45,.75);color:#a8c8e0;font-weight:700;font-size:11px;
+    cursor:pointer;text-transform:uppercase;
+    transition:background .2s,color .2s,border-color .2s}
+  .tab.active{background:linear-gradient(160deg,#0095cc,#006699);color:#fff;
+    border-color:#5fd4ff;box-shadow:0 0 15px rgba(0,180,255,.5)}
+
+  .list{background:rgba(5,25,45,.8);backdrop-filter:blur(12px);
+    border-radius:16px;border:1px solid rgba(100,200,255,.35);
+    padding:8px;height:150px;overflow-y:auto;display:flex;flex-direction:column;
+    gap:6px;flex-shrink:0;box-shadow:0 4px 20px rgba(0,100,150,.2);
+    -webkit-overflow-scrolling:touch}
+  .list::-webkit-scrollbar{width:5px}
+  .list::-webkit-scrollbar-thumb{background:#0095cc;border-radius:3px}
+
+  .item{display:flex;align-items:center;gap:10px;padding:10px;
+    background:linear-gradient(160deg,rgba(20,70,110,.6),rgba(5,25,45,.6));
+    border-radius:12px;border:1px solid rgba(100,200,255,.2);
+    transition:border-color .2s,background .2s;cursor:pointer}
+  .item:not(.locked):not(.maxed):hover{border-color:#5fd4ff;
+    background:linear-gradient(160deg,rgba(30,90,140,.7),rgba(10,40,70,.7))}
+  .item.locked{opacity:.55;cursor:not-allowed}
+  .item.maxed{opacity:.85;cursor:default;border-color:#ffcc00;
+    background:linear-gradient(160deg,rgba(120,80,20,.4),rgba(60,40,10,.4))}
+  .item .emoji{font-size:26px;flex-shrink:0;pointer-events:none}
+  .item .info{flex:1;min-width:0;pointer-events:none}
+  .item .name{font-weight:800;font-size:12px;margin-bottom:2px}
+  .item .desc{font-size:10px;color:#a8c8e0}
+  .item .lvl{font-size:10px;color:#5fd4ff;font-weight:800;margin-top:2px}
+  .item.maxed .lvl{color:#ffcc00}
+  .item .cost{text-align:right;flex-shrink:0;pointer-events:none}
+  .item .cost .price{font-weight:900;font-size:12px;color:#ffcc00;
+    text-shadow:0 0 8px rgba(255,204,0,.5)}
+  .item.maxed .cost .price{color:#ffcc00}
+  .item .cost .have{font-size:10px;color:#5fd4ff;margin-top:2px;font-weight:800}
+
+  .evolve-btn{padding:13px;border-radius:14px;border:2px solid #ffcc00;
+    background:linear-gradient(160deg,rgba(255,204,0,.25),rgba(255,107,0,.15));
+    color:#ffcc00;font-weight:900;font-size:14px;cursor:pointer;
+    text-transform:uppercase;letter-spacing:1px;margin-top:8px;
+    transition:box-shadow .2s;flex-shrink:0;
+    box-shadow:0 4px 20px rgba(255,204,0,.2)}
+  .evolve-btn:not(:disabled):hover{box-shadow:0 0 30px rgba(255,204,0,.5)}
+  .evolve-btn:disabled{opacity:.35;cursor:not-allowed}
+  .evolve-btn.ready{animation:pulseGold 1.5s infinite}
+  @keyframes pulseGold{0%,100%{box-shadow:0 0 20px rgba(255,204,0,.4)}
+    50%{box-shadow:0 0 40px rgba(255,204,0,.9)}}
+
+  .modal{position:fixed;inset:0;background:rgba(0,10,20,.9);backdrop-filter:blur(12px);
+    display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+  .modal.show{display:flex}
+  .modal-card{background:linear-gradient(160deg,#0a3d5c,#041a2a);
+    border:2px solid #5fd4ff;border-radius:24px;padding:28px 22px;
+    max-width:380px;width:100%;text-align:center;
+    animation:pop .4s cubic-bezier(.2,1.4,.4,1);
+    box-shadow:0 0 60px rgba(0,180,255,.4);max-height:90vh;overflow-y:auto}
+  @keyframes pop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+  .modal-card .m-emoji{font-size:72px;margin-bottom:12px;
+    display:flex;justify-content:center;align-items:center}
+  .modal-card .m-title{font-size:22px;font-weight:900;margin-bottom:8px;
+    background:linear-gradient(90deg,#5fd4ff,#00ff88);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-transform:uppercase}
+  .modal-card .m-desc{font-size:14px;color:#a8c8e0;line-height:1.6;
+    margin-bottom:18px;white-space:pre-line}
+  .modal-btn{width:100%;padding:14px;border-radius:12px;border:none;
+    font-weight:900;font-size:14px;cursor:pointer;text-transform:uppercase;
+    letter-spacing:1px;transition:filter .2s;margin-top:8px;
+    background:linear-gradient(90deg,#0095cc,#006699);color:#fff}
+  .modal-btn:hover{filter:brightness(1.15)}
+
+  .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-120px);
+    background:linear-gradient(90deg,#0095cc,#006699);padding:12px 24px;
+    border-radius:12px;font-weight:800;font-size:13px;z-index:200;
+    box-shadow:0 10px 40px rgba(0,180,255,.6);
+    transition:transform .4s cubic-bezier(.2,1.4,.4,1);max-width:90vw;text-align:center;
+    pointer-events:none}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .toast.gold{background:linear-gradient(90deg,#ffcc00,#ff6b00);color:#1a0b00}
+  .toast.green{background:linear-gradient(90deg,#00ff88,#00b366);color:#001a0a}
+  .toast.red{background:linear-gradient(90deg,#ff3b3b,#cc0000)}
+
+  .menu{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;padding:20px;
+    background:radial-gradient(ellipse at 50% 40%,rgba(10,80,130,.7) 0%,rgba(2,10,20,.98) 70%)}
+  .menu.hidden{display:none}
+  .menu-logo{font-size:clamp(30px,8vw,50px);font-weight:900;margin-bottom:8px;
+    background:linear-gradient(90deg,#5fd4ff,#00ff88,#ffcc00);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    letter-spacing:2px;text-transform:uppercase;
+    filter:drop-shadow(0 0 30px rgba(100,220,255,.5))}
+  .menu-sub{color:#a8c8e0;font-size:13px;margin-bottom:28px}
+  .menu-btn{padding:16px 44px;border-radius:14px;border:none;font-weight:900;
+    font-size:16px;cursor:pointer;text-transform:uppercase;letter-spacing:1.5px;
+    transition:transform .2s,box-shadow .2s;margin:6px;min-width:220px;
+    background:linear-gradient(90deg,#0095cc,#006699);color:#fff;
+    box-shadow:0 8px 30px rgba(0,180,255,.5)}
+  .menu-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,180,255,.7)}
+  .menu-btn:active{transform:translateY(0)}
+  .menu-btn.secondary{background:rgba(255,255,255,.08);color:#fff;
+    border:1px solid rgba(255,255,255,.2);font-size:13px;padding:12px 30px;
+    box-shadow:none;min-width:180px}
+
+  @media(max-width:400px){
+    .main-creature{width:150px !important;height:150px !important}
+    .list{height:130px}
+    .evo-track{height:16px}
+    .mut-btn{font-size:10px;padding:9px 4px}
+    .res b{font-size:14px}
+  }
+</style>
+</head>
+<body>
+
+<div class="world-bg water" id="worldBg"></div>
+
+<div class="app" id="app" style="display:none">
+
+  <div class="top">
+    <div class="res">🧬 ДНК<b id="dnaVal">0</b></div>
+    <div class="res">💎 Кристаллы<b class="gold" id="crystalsVal">0</b></div>
+    <div class="res">⭐ Стадия<b id="levelVal">1</b></div>
+  </div>
+
+  <div class="evolution-bar">
+    <div class="evo-header">
+      <span class="stage-name" id="stageLabel">🌊 ДНК</span>
+      <span class="timer" id="timerLabel">⏱ 60с</span>
+      <span class="next-name" id="nextLabel">→ Бактерия</span>
+    </div>
+    <div class="evo-track">
+      <div class="evo-fill" id="evoFill"></div>
+      <div class="evo-text" id="evoText">0 / 500</div>
+    </div>
+  </div>
+
+  <div class="evolution-zone" id="evolutionZone">
+    <div class="combo-indicator" id="comboInd">🔥 x2</div>
+    <div class="event-toast" id="eventToast"></div>
+    <div class="creature-name" id="creatureName">🌊 ДНК</div>
+  </div>
+
+  <div class="mutations">
+    <button class="mut-btn mut-1" data-action="buy-mutation" data-id="fast">
+      <span class="icon">👆</span>Сила<br>клика
+    </button>
+    <button class="mut-btn mut-2" data-action="buy-generator" data-id="mitosis">
+      <span class="icon">⚡</span>Авто-<br>сбор
+    </button>
+    <button class="mut-btn mut-3" data-action="watch-ad">
+      <span class="icon">📺</span>Бонус<br>+3💎
+    </button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="mutations">🧬 Мутации</div>
+    <div class="tab" data-tab="generators">⚙️ Улучшения</div>
+    <div class="tab" data-tab="shop">💎 Магазин</div>
+    <div class="tab" data-tab="collection">📦 Миры</div>
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <button class="evolve-btn" id="evolveBtn" data-action="evolve">🧬 Эволюция <span id="evoInfo"></span></button>
+
+</div>
+
+<div class="menu" id="menu">
+  <div class="menu-logo">Эволюция</div>
+  <div class="menu-sub">🌍 7 миров • ⏱ таймер • 🔥 комбо • 💾 автосейв</div>
+  <button class="menu-btn" data-action="start">▶ Играть</button>
+  <button class="menu-btn secondary" data-action="reset">🗑 Сбросить прогресс</button>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <div class="m-emoji" id="mEmoji"></div>
+    <div class="m-title" id="mTitle">Эволюция!</div>
+    <div class="m-desc" id="mDesc"></div>
+    <button class="modal-btn" data-action="close-modal">ОК</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   ЗАГЛУШКА РЕКЛАМЫ
+============================================================ */
+const adv = {
+  showRewardedVideo: ({callbacks}) => {
+    setTimeout(() => {
+      callbacks && callbacks.onOpen && callbacks.onOpen();
+      setTimeout(() => callbacks && callbacks.onRewarded && callbacks.onRewarded(), 400);
+      setTimeout(() => callbacks && callbacks.onClose && callbacks.onClose(), 600);
+    }, 200);
+  }
+};
+
+/* ============================================================
+   SVG СУЩЕСТВА
+============================================================ */
+function svgDNA() {
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="dna1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5fd4ff"/><stop offset="100%" stop-color="#00ff88"/></linearGradient>
+      <linearGradient id="dna2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff3b9a"/><stop offset="100%" stop-color="#ffcc00"/></linearGradient>
+    </defs>
+    <g transform="translate(100,100)">
+      <path d="M -30 -80 Q 30 -50 -30 -20 Q 30 10 -30 40 Q 30 70 -30 80" fill="none" stroke="url(#dna1)" stroke-width="10" stroke-linecap="round"/>
+      <path d="M 30 -80 Q -30 -50 30 -20 Q -30 10 30 40 Q -30 70 30 80" fill="none" stroke="url(#dna2)" stroke-width="10" stroke-linecap="round"/>
+      <line x1="-28" y1="-70" x2="28" y2="-70" stroke="#a5b4ff" stroke-width="3" opacity="0.6"/>
+      <line x1="-28" y1="-40" x2="28" y2="-40" stroke="#a5b4ff" stroke-width="3" opacity="0.6"/>
+      <line x1="-28" y1="-10" x2="28" y2="-10" stroke="#a5b4ff" stroke-width="3" opacity="0.6"/>
+      <line x1="-28" y1="20" x2="28" y2="20" stroke="#a5b4ff" stroke-width="3" opacity="0.6"/>
+      <line x1="-28" y1="50" x2="28" y2="50" stroke="#a5b4ff" stroke-width="3" opacity="0.6"/>
+      <line x1="-28" y1="80" x2="28" y2="80" stroke="#a5b4ff" stroke-width="3" opacity="0.6"/>
+    </g>
+  </svg>`;
+}
+function svgBacteria(color) {
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs><radialGradient id="bactG" cx="35%" cy="35%"><stop offset="0%" stop-color="#7dffb8"/><stop offset="100%" stop-color="${color}"/></radialGradient></defs>
+    <g transform="translate(100,100)">
+      <path d="M -55 -20 Q -85 -30 -95 -55 Q -100 -70 -90 -75" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+      <path d="M -55 20 Q -85 30 -95 55 Q -100 70 -90 75" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+      <path d="M 55 0 Q 85 10 95 40" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+      <path d="M 55 -30 Q 80 -40 100 -60" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+      <ellipse cx="0" cy="0" rx="55" ry="35" fill="url(#bactG)"/>
+      <circle cx="-15" cy="-5" r="11" fill="#fff"/><circle cx="-13" cy="-3" r="5" fill="#000"/>
+      <circle cx="15" cy="-5" r="11" fill="#fff"/><circle cx="17" cy="-3" r="5" fill="#000"/>
+      <path d="M -8 12 Q 0 20 8 12" stroke="#000" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </g>
+  </svg>`;
+}
+function svgAmoeba(color) {
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs><radialGradient id="amoG" cx="40%" cy="35%"><stop offset="0%" stop-color="#7dffff"/><stop offset="100%" stop-color="${color}"/></radialGradient></defs>
+    <g transform="translate(100,100)">
+      <path d="M -60 -20 Q -75 -45 -55 -50 Q -35 -60 -20 -45 Q -10 -65 10 -60 Q 30 -70 45 -50 Q 65 -55 70 -35 Q 85 -25 75 -5 Q 80 15 65 25 Q 70 45 50 50 Q 40 65 20 55 Q 5 70 -15 60 Q -30 70 -45 50 Q -65 55 -70 35 Q -85 20 -75 0 Q -80 -15 -60 -20 Z" fill="url(#amoG)" opacity="0.9">
+        <animate attributeName="d" values="M -60 -20 Q -75 -45 -55 -50 Q -35 -60 -20 -45 Q -10 -65 10 -60 Q 30 -70 45 -50 Q 65 -55 70 -35 Q 85 -25 75 -5 Q 80 15 65 25 Q 70 45 50 50 Q 40 65 20 55 Q 5 70 -15 60 Q -30 70 -45 50 Q -65 55 -70 35 Q -85 20 -75 0 Q -80 -15 -60 -20 Z;M -55 -25 Q -70 -50 -50 -55 Q -30 -65 -15 -50 Q -5 -70 15 -55 Q 35 -65 50 -45 Q 70 -50 70 -30 Q 85 -20 70 0 Q 75 20 60 30 Q 65 50 45 55 Q 35 70 15 60 Q 0 75 -20 65 Q -35 75 -50 55 Q -70 60 -75 40 Q -90 25 -75 5 Q -80 -10 -55 -25 Z;M -60 -20 Q -75 -45 -55 -50 Q -35 -60 -20 -45 Q -10 -65 10 -60 Q 30 -70 45 -50 Q 65 -55 70 -35 Q 85 -25 75 -5 Q 80 15 65 25 Q 70 45 50 50 Q 40 65 20 55 Q 5 70 -15 60 Q -30 70 -45 50 Q -65 55 -70 35 Q -85 20 -75 0 Q -80 -15 -60 -20 Z" dur="4s" repeatCount="indefinite"/>
+      </path>
+      <circle cx="-10" cy="5" r="15" fill="#00a8cc" opacity="0.6"/>
+      <ellipse cx="-20" cy="-10" rx="11" ry="13" fill="#fff"/><circle cx="-18" cy="-8" r="5" fill="#000"/>
+      <ellipse cx="15" cy="-10" rx="11" ry="13" fill="#fff"/><circle cx="17" cy="-8" r="5" fill="#000"/>
+      <path d="M -10 15 Q 0 25 10 15" stroke="#000" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </g>
+  </svg>`;
+}
+function svgFish(color) {
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="fishG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5fb8ff"/><stop offset="50%" stop-color="${color}"/><stop offset="100%" stop-color="#0055aa"/></linearGradient>
+      <radialGradient id="fishEye" cx="40%" cy="40%"><stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#ccc"/></radialGradient>
+    </defs>
+    <g transform="translate(100,100)">
+      <path d="M -55 0 L -85 -25 L -75 0 L -85 25 Z" fill="${color}" opacity="0.9"/>
+      <path d="M -20 -35 Q 0 -60 25 -35 Q 5 -30 -20 -35 Z" fill="${color}" opacity="0.9"/>
+      <path d="M -10 30 Q 10 50 25 30 Q 5 35 -10 30 Z" fill="${color}" opacity="0.9"/>
+      <ellipse cx="0" cy="0" rx="60" ry="38" fill="url(#fishG)"/>
+      <circle cx="30" cy="-8" r="14" fill="url(#fishEye)"/>
+      <circle cx="32" cy="-6" r="7" fill="#000"/>
+      <circle cx="29" cy="-9" r="3" fill="#fff"/>
+      <path d="M 55 5 Q 58 10 55 15" stroke="#003366" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </g>
+  </svg>`;
+}
+function svgLizard(color) {
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="lizG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#b8ff5f"/><stop offset="100%" stop-color="${color}"/></linearGradient></defs>
+    <g transform="translate(100,100)">
+      <path d="M -50 0 Q -85 -10 -90 20 Q -95 45 -80 50" stroke="${color}" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <path d="M -30 20 Q -45 35 -55 35 M -50 30 L -60 25" stroke="${color}" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <path d="M -10 25 Q -15 45 -5 50 M -5 50 L -15 55" stroke="${color}" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <ellipse cx="0" cy="5" rx="55" ry="28" fill="url(#lizG)"/>
+      <path d="M 30 20 Q 40 40 55 40 M 50 35 L 60 30" stroke="${color}" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <path d="M 45 15 Q 60 20 70 10 M 65 10 L 75 5" stroke="${color}" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <path d="M -40 -20 L -35 -35 L -25 -22 L -15 -38 L -5 -25 L 5 -40 L 15 -25 L 25 -35 L 35 -20" fill="${color}" stroke="#003300" stroke-width="1.5"/>
+      <ellipse cx="55" cy="-5" rx="25" ry="20" fill="url(#lizG)"/>
+      <circle cx="50" cy="-10" r="7" fill="#ffff00"/><ellipse cx="50" cy="-10" rx="2" ry="6" fill="#000"/>
+      <circle cx="65" cy="-10" r="7" fill="#ffff00"/><ellipse cx="65" cy="-10" rx="2" ry="6" fill="#000"/>
+      <path d="M 60 5 Q 70 8 76 5" stroke="#003300" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+  </svg>`;
+}
+function svgApe(color) {
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="apeFur" cx="40%" cy="35%"><stop offset="0%" stop-color="#a87a4a"/><stop offset="100%" stop-color="#6a4520"/></radialGradient>
+      <radialGradient id="apeFace" cx="40%" cy="40%"><stop offset="0%" stop-color="#ffe0b8"/><stop offset="100%" stop-color="#e8b888"/></radialGradient>
+      <radialGradient id="apeEar" cx="40%" cy="40%"><stop offset="0%" stop-color="#f5d0a8"/><stop offset="100%" stop-color="#d8a878"/></radialGradient>
+    </defs>
+    <g transform="translate(100,100)">
+      <path d="M 55 65 Q 85 75 90 45 Q 92 25 80 15" stroke="url(#apeFur)" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <ellipse cx="-38" cy="68" rx="18" ry="12" fill="url(#apeFur)"/>
+      <ellipse cx="38" cy="68" rx="18" ry="12" fill="url(#apeFur)"/>
+      <ellipse cx="-38" cy="72" rx="12" ry="7" fill="url(#apeFace)"/>
+      <ellipse cx="38" cy="72" rx="12" ry="7" fill="url(#apeFace)"/>
+      <ellipse cx="0" cy="40" rx="42" ry="42" fill="url(#apeFur)"/>
+      <ellipse cx="0" cy="42" rx="28" ry="30" fill="url(#apeFace)"/>
+      <path d="M -40 25 Q -60 45 -55 68" stroke="url(#apeFur)" stroke-width="16" fill="none" stroke-linecap="round"/>
+      <path d="M 40 25 Q 60 45 55 68" stroke="url(#apeFur)" stroke-width="16" fill="none" stroke-linecap="round"/>
+      <ellipse cx="-57" cy="72" rx="11" ry="8" fill="url(#apeFace)"/>
+      <ellipse cx="57" cy="72" rx="11" ry="8" fill="url(#apeFace)"/>
+      <circle cx="-42" cy="-32" r="18" fill="url(#apeFur)"/>
+      <circle cx="-42" cy="-32" r="11" fill="url(#apeEar)"/>
+      <circle cx="42" cy="-32" r="18" fill="url(#apeFur)"/>
+      <circle cx="42" cy="-32" r="11" fill="url(#apeEar)"/>
+      <circle cx="0" cy="-25" r="40" fill="url(#apeFur)"/>
+      <ellipse cx="0" cy="-10" rx="32" ry="30" fill="url(#apeFace)"/>
+      <path d="M -25 -50 Q -15 -68 -5 -52 Q 5 -70 12 -52 Q 22 -66 30 -50 Q 32 -55 35 -48" fill="url(#apeFur)" stroke="url(#apeFur)" stroke-width="2"/>
+      <path d="M -22 -35 Q -15 -40 -8 -38" stroke="#3a2010" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M 22 -35 Q 15 -40 8 -38" stroke="#3a2010" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="-13" cy="-22" rx="10" ry="12" fill="#fff"/>
+      <ellipse cx="13" cy="-22" rx="10" ry="12" fill="#fff"/>
+      <circle cx="-12" cy="-20" r="7" fill="#4aa3e8"/><circle cx="-12" cy="-20" r="3.5" fill="#000"/>
+      <circle cx="14" cy="-20" r="7" fill="#4aa3e8"/><circle cx="14" cy="-20" r="3.5" fill="#000"/>
+      <circle cx="-10" cy="-23" r="2.5" fill="#fff"/><circle cx="16" cy="-23" r="2.5" fill="#fff"/>
+      <ellipse cx="0" cy="-6" rx="8" ry="5" fill="#ff9aa8"/>
+      <ellipse cx="-3" cy="-6" rx="1.5" ry="1" fill="#8a3040"/><ellipse cx="3" cy="-6" rx="1.5" ry="1" fill="#8a3040"/>
+      <path d="M -14 4 Q 0 18 14 4" stroke="#8a3040" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M -10 8 Q 0 16 10 8 Q 5 14 0 14 Q -5 14 -10 8 Z" fill="#8a2030"/>
+      <path d="M -6 8 Q 0 12 6 8" fill="#ff6b80"/>
+      <ellipse cx="-24" cy="-2" rx="6" ry="4" fill="#ff9aa8" opacity="0.5"/>
+      <ellipse cx="24" cy="-2" rx="6" ry="4" fill="#ff9aa8" opacity="0.5"/>
+    </g>
+  </svg>`;
+}
+function svgHuman(color) {
+  return `<svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="humSkin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffddb5"/><stop offset="100%" stop-color="#f5c896"/></linearGradient>
+      <linearGradient id="humHair" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8b5a2b"/><stop offset="100%" stop-color="#5a3a1a"/></linearGradient>
+      <linearGradient id="humSweater" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5a6670"/><stop offset="100%" stop-color="#3a4650"/></linearGradient>
+      <linearGradient id="humPants" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8a7560"/><stop offset="100%" stop-color="#5a4838"/></linearGradient>
+    </defs>
+    <g transform="translate(100,120)">
+      <ellipse cx="-22" cy="105" rx="18" ry="9" fill="#3a2515"/><ellipse cx="22" cy="105" rx="18" ry="9" fill="#3a2515"/>
+      <rect x="-32" y="30" width="24" height="75" rx="6" fill="url(#humPants)"/>
+      <rect x="8" y="30" width="24" height="75" rx="6" fill="url(#humPants)"/>
+      <path d="M -42 30 L -40 -15 Q -38 -25 -25 -28 L 25 -28 Q 38 -25 40 -15 L 42 30 Q 42 34 38 34 L -38 34 Q -42 34 -42 30 Z" fill="url(#humSweater)"/>
+      <path d="M -12 -28 L 0 -8 L 12 -28 Z" fill="#f5f5f0"/>
+      <path d="M -42 -15 Q -55 5 -55 25 Q -55 32 -50 32 Q -45 32 -44 25 L -40 5" fill="url(#humSweater)" stroke="#2a3640" stroke-width="1"/>
+      <path d="M 42 -15 Q 55 5 55 25 Q 55 32 50 32 Q 45 32 44 25 L 40 5" fill="url(#humSweater)" stroke="#2a3640" stroke-width="1"/>
+      <ellipse cx="-50" cy="38" rx="9" ry="10" fill="url(#humSkin)"/>
+      <ellipse cx="50" cy="38" rx="9" ry="10" fill="url(#humSkin)"/>
+      <rect x="-12" y="-38" width="24" height="15" rx="4" fill="url(#humSkin)"/>
+      <ellipse cx="0" cy="-70" rx="38" ry="44" fill="url(#humSkin)"/>
+      <path d="M -38 -75 Q -42 -105 -20 -115 Q 0 -122 20 -115 Q 42 -105 38 -75 Q 35 -85 25 -90 Q 20 -100 10 -95 Q 0 -100 -10 -95 Q -20 -100 -25 -90 Q -35 -85 -38 -75 Z" fill="url(#humHair)"/>
+      <ellipse cx="-38" cy="-65" rx="6" ry="10" fill="url(#humSkin)"/>
+      <ellipse cx="38" cy="-65" rx="6" ry="10" fill="url(#humSkin)"/>
+      <path d="M -25 -85 Q -18 -90 -8 -87" stroke="#5a3a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M 25 -85 Q 18 -90 8 -87" stroke="#5a3a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="-14" cy="-72" rx="9" ry="10" fill="#fff"/>
+      <ellipse cx="14" cy="-72" rx="9" ry="10" fill="#fff"/>
+      <circle cx="-14" cy="-71" r="7" fill="#4a9bd8"/><circle cx="-14" cy="-71" r="3" fill="#000"/>
+      <circle cx="14" cy="-71" r="7" fill="#4a9bd8"/><circle cx="14" cy="-71" r="3" fill="#000"/>
+      <circle cx="-16" cy="-74" r="2" fill="#fff"/><circle cx="12" cy="-74" r="2" fill="#fff"/>
+      <path d="M 0 -70 Q -2 -62 0 -58 Q 2 -60 3 -62" stroke="#d8a878" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M -22 -50 Q -28 -45 -25 -35 Q -20 -28 -10 -30 Q -5 -32 0 -30 Q 5 -32 10 -30 Q 20 -28 25 -35 Q 28 -45 22 -50 Q 15 -48 10 -50 Q 5 -52 0 -50 Q -5 -52 -10 -50 Q -15 -48 -22 -50 Z" fill="url(#humHair)" opacity="0.85"/>
+      <path d="M -8 -40 Q 0 -36 8 -40" stroke="#8a3a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+  </svg>`;
+}
+function svgCyborg() {
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="cybG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c8d0e8"/><stop offset="100%" stop-color="#8899cc"/></linearGradient>
+      <linearGradient id="metalG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6a7090"/><stop offset="100%" stop-color="#404460"/></linearGradient>
+    </defs>
+    <g transform="translate(100,100)">
+      <ellipse cx="0" cy="40" rx="35" ry="45" fill="url(#cybG)"/>
+      <rect x="-30" y="20" width="60" height="35" rx="5" fill="url(#metalG)"/>
+      <circle cx="0" cy="37" r="8" fill="#00ff88"><animate attributeName="opacity" values="1;0.4;1" dur="1.2s" repeatCount="indefinite"/></circle>
+      <ellipse cx="-42" cy="40" rx="9" ry="30" fill="url(#metalG)" transform="rotate(-10 -42 40)"/>
+      <ellipse cx="42" cy="40" rx="9" ry="30" fill="url(#metalG)" transform="rotate(10 42 40)"/>
+      <ellipse cx="0" cy="-25" rx="30" ry="35" fill="url(#cybG)"/>
+      <path d="M 0 -60 Q 30 -55 30 -25 Q 30 5 0 10 Z" fill="url(#metalG)" opacity="0.7"/>
+      <circle cx="12" cy="-25" r="10" fill="#202440"/>
+      <circle cx="12" cy="-25" r="7" fill="#ff3b3b"><animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/></circle>
+      <circle cx="12" cy="-25" r="3" fill="#fff"/>
+      <ellipse cx="-12" cy="-25" rx="7" ry="6" fill="#fff"/><circle cx="-12" cy="-25" r="3.5" fill="#4a7a9a"/>
+      <rect x="-15" y="-50" width="30" height="8" rx="2" fill="#404460"/>
+      <path d="M -6 -3 L 6 -3" stroke="#404460" stroke-width="2" stroke-linecap="round"/>
+      <line x1="20" y1="-55" x2="25" y2="-80" stroke="#404460" stroke-width="2"/>
+      <circle cx="25" cy="-82" r="4" fill="#ff3b3b"/>
+    </g>
+  </svg>`;
+}
+function svgAlien() {
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="alienBody" cx="40%" cy="35%">
+        <stop offset="0%" stop-color="#aaffaa"/>
+        <stop offset="60%" stop-color="#5acc5a"/>
+        <stop offset="100%" stop-color="#2a702a"/>
+      </radialGradient>
+      <radialGradient id="alienEye" cx="50%" cy="40%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="60%" stop-color="#202020"/>
+        <stop offset="100%" stop-color="#000000"/>
+      </radialGradient>
+    </defs>
+    <g transform="translate(100,100)">
+      <circle cx="0" cy="0" r="85" fill="rgba(100,255,100,.15)">
+        <animate attributeName="r" values="80;90;80" dur="2.5s" repeatCount="indefinite"/>
+      </circle>
+      <ellipse cx="0" cy="40" rx="38" ry="45" fill="url(#alienBody)"/>
+      <circle cx="0" cy="35" r="10" fill="#aaffaa" opacity="0.8">
+        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="0" cy="35" r="4" fill="#fff"/>
+      <ellipse cx="-45" cy="40" rx="8" ry="28" fill="url(#alienBody)" transform="rotate(-15 -45 40)"/>
+      <ellipse cx="45" cy="40" rx="8" ry="28" fill="url(#alienBody)" transform="rotate(15 45 40)"/>
+      <circle cx="-52" cy="68" r="8" fill="#5acc5a"/>
+      <circle cx="52" cy="68" r="8" fill="#5acc5a"/>
+      <ellipse cx="0" cy="-30" rx="42" ry="48" fill="url(#alienBody)"/>
+      <ellipse cx="-15" cy="-25" rx="14" ry="18" fill="url(#alienEye)"/>
+      <ellipse cx="15" cy="-25" rx="14" ry="18" fill="url(#alienEye)"/>
+      <circle cx="-15" cy="-28" r="4" fill="#fff" opacity="0.9"/>
+      <circle cx="15" cy="-28" r="4" fill="#fff" opacity="0.9"/>
+      <ellipse cx="-3" cy="-8" rx="1.5" ry="2" fill="#2a5020"/>
+      <ellipse cx="3" cy="-8" rx="1.5" ry="2" fill="#2a5020"/>
+      <path d="M -8 -2 Q 0 4 8 -2" stroke="#2a5020" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <line x1="-15" y1="-72" x2="-25" y2="-95" stroke="#5acc5a" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="-25" cy="-98" r="5" fill="#aaffaa">
+        <animate attributeName="r" values="5;7;5" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+      <line x1="15" y1="-72" x2="25" y2="-95" stroke="#5acc5a" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="25" cy="-98" r="5" fill="#aaffaa">
+        <animate attributeName="r" values="5;7;5" dur="1.5s" repeatCount="indefinite" begin="0.5s"/>
+      </circle>
+    </g>
+  </svg>`;
+}
+function svgBossAlien() {
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="bossBody" cx="40%" cy="35%">
+        <stop offset="0%" stop-color="#ff6b6b"/>
+        <stop offset="60%" stop-color="#a02020"/>
+        <stop offset="100%" stop-color="#3a0505"/>
+      </radialGradient>
+      <radialGradient id="bossEye" cx="50%" cy="40%">
+        <stop offset="0%" stop-color="#ffff00"/>
+        <stop offset="60%" stop-color="#ff6600"/>
+        <stop offset="100%" stop-color="#800000"/>
+      </radialGradient>
+      <radialGradient id="bossAura" cx="50%" cy="50%">
+        <stop offset="0%" stop-color="rgba(255,50,50,.5)"/>
+        <stop offset="100%" stop-color="rgba(255,50,50,0)"/>
+      </radialGradient>
+    </defs>
+    <g transform="translate(100,100)">
+      <circle cx="0" cy="0" r="95" fill="url(#bossAura)">
+        <animate attributeName="r" values="90;100;90" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+      <path d="M -45 -20 L -70 -35 L -50 -5 L -75 0 L -50 20 L -70 40 L -45 25" fill="#5a0808" stroke="#ff6b6b" stroke-width="1.5"/>
+      <path d="M 45 -20 L 70 -35 L 50 -5 L 75 0 L 50 20 L 70 40 L 45 25" fill="#5a0808" stroke="#ff6b6b" stroke-width="1.5"/>
+      <ellipse cx="0" cy="40" rx="45" ry="50" fill="url(#bossBody)"/>
+      <ellipse cx="0" cy="40" rx="30" ry="30" fill="#200" opacity="0.6"/>
+      <circle cx="0" cy="35" r="12" fill="#ff0000">
+        <animate attributeName="opacity" values="0.6;1;0.6" dur="0.8s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="0" cy="35" r="6" fill="#ffff00"/>
+      <circle cx="0" cy="35" r="3" fill="#fff"/>
+      <ellipse cx="-50" cy="45" rx="10" ry="32" fill="url(#bossBody)" transform="rotate(-20 -50 45)"/>
+      <ellipse cx="50" cy="45" rx="10" ry="32" fill="url(#bossBody)" transform="rotate(20 50 45)"/>
+      <circle cx="-58" cy="75" r="12" fill="#5a0808"/>
+      <circle cx="58" cy="75" r="12" fill="#5a0808"/>
+      <ellipse cx="0" cy="-35" rx="46" ry="50" fill="url(#bossBody)"/>
+      <path d="M -35 -75 L -50 -105 L -30 -85 L -25 -100 L -15 -75 Z" fill="#5a0808" stroke="#ff6b6b" stroke-width="1.5"/>
+      <path d="M 35 -75 L 50 -105 L 30 -85 L 25 -100 L 15 -75 Z" fill="#5a0808" stroke="#ff6b6b" stroke-width="1.5"/>
+      <ellipse cx="-16" cy="-30" rx="12" ry="14" fill="url(#bossEye)">
+        <animate attributeName="opacity" values="1;0.6;1" dur="0.6s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="16" cy="-30" rx="12" ry="14" fill="url(#bossEye)">
+        <animate attributeName="opacity" values="1;0.6;1" dur="0.6s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="-16" cy="-30" rx="3" ry="10" fill="#000"/>
+      <ellipse cx="16" cy="-30" rx="3" ry="10" fill="#000"/>
+      <path d="M -18 -5 L -12 8 L -4 -2 L 4 8 L 12 -2 L 18 8 L 22 -5" stroke="#200" stroke-width="2.5" fill="#200" stroke-linejoin="round"/>
+      <path d="M -14 -3 L -10 5 L -4 0 L 4 5 L 10 0 L 14 5" stroke="#fff" stroke-width="1" fill="none"/>
+      <line x1="-12" y1="-80" x2="-20" y2="-100" stroke="#5a0808" stroke-width="3" stroke-linecap="round"/>
+      <line x1="12" y1="-80" x2="20" y2="-100" stroke="#5a0808" stroke-width="3" stroke-linecap="round"/>
+    </g>
+  </svg>`;
+}
+function svgPosthuman() {
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="postAura"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.4"/><stop offset="50%" stop-color="#c88bff" stop-opacity="0.2"/><stop offset="100%" stop-color="#8847ff" stop-opacity="0"/></radialGradient>
+      <radialGradient id="postBody" cx="40%" cy="30%"><stop offset="0%" stop-color="#ffffff"/><stop offset="50%" stop-color="#c88bff"/><stop offset="100%" stop-color="#8847ff"/></radialGradient>
+      <linearGradient id="postVisor" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00ff88"/><stop offset="100%" stop-color="#00ffff"/></linearGradient>
+    </defs>
+    <g transform="translate(100,100)">
+      <circle cx="0" cy="0" r="95" fill="url(#postAura)"><animate attributeName="r" values="90;100;90" dur="3s" repeatCount="indefinite"/></circle>
+      <ellipse cx="0" cy="-85" rx="30" ry="8" fill="none" stroke="#ffcc00" stroke-width="3"/>
+      <ellipse cx="0" cy="40" rx="35" ry="45" fill="url(#postBody)"/>
+      <circle cx="0" cy="35" r="12" fill="#00ff88" opacity="0.7"/>
+      <ellipse cx="-42" cy="40" rx="9" ry="30" fill="url(#postBody)" transform="rotate(-10 -42 40)"/>
+      <ellipse cx="42" cy="40" rx="9" ry="30" fill="url(#postBody)" transform="rotate(10 42 40)"/>
+      <ellipse cx="0" cy="-25" rx="32" ry="36" fill="url(#postBody)"/>
+      <rect x="-22" y="-32" width="44" height="14" rx="7" fill="url(#postVisor)" opacity="0.9"/>
+      <circle cx="-10" cy="-25" r="3" fill="#fff"/><circle cx="10" cy="-25" r="3" fill="#fff"/>
+      <path d="M -8 -5 Q 0 3 8 -5" stroke="#5a2080" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+  </svg>`;
+}
+
+/* ============================================================
+   МИРЫ
+============================================================ */
+const WORLDS = {
+  water:       {emoji:'💧', name:'Океан',       particles:['🫧','💧','🐟','🦐','🪼']},
+  earth:       {emoji:'🌴', name:'Остров',      particles:['🍃','🌺','🦋','🌴','🐚']},
+  city:        {emoji:'🏙️', name:'Город',       particles:['🌆','✨','🚗','💡','🏙️']},
+  moonCosmos:  {emoji:'🌕', name:'Луна и Космос',particles:['⭐','✨','💫','🌠','🪐']},
+  alien:       {emoji:'👽', name:'Планета Ксен', particles:['🛸','✨','💚','🟢','👽']},
+  boss:        {emoji:'👾', name:'Тёмная Зона', particles:['💀','🔥','⚡','💥','☠️']},
+  divine:      {emoji:'✨', name:'Божество',    particles:['✨','🌟','💫','☀️','🕊️']},
+};
+
+const STAGES = [
+  {id:0, shape:'dna',       color:'#00d9ff', name:'ДНК',            need:500,         world:'water',      time:60},
+  {id:1, shape:'bacteria',  color:'#00ffcc', name:'Бактерия',       need:3000,        world:'water',      time:75},
+  {id:2, shape:'amoeba',    color:'#00c8ff', name:'Амёба',          need:15000,       world:'water',      time:90},
+  {id:3, shape:'fish',      color:'#0088ff', name:'Рыба',           need:75000,       world:'water',      time:120},
+  {id:4, shape:'lizard',    color:'#88dd33', name:'Ящерица',        need:375000,      world:'earth',      time:150},
+  {id:5, shape:'ape',       color:'#a6723f', name:'Обезьяна',       need:1875000,     world:'earth',      time:180},
+  {id:6, shape:'human',     color:'#ffcc88', name:'Человек',        need:9375000,     world:'city',       time:210},
+  {id:7, shape:'cyborg',    color:'#8899cc', name:'Киборг',         need:50000000,    world:'moonCosmos', time:240},
+  {id:8, shape:'alien',     color:'#5acc5a', name:'Инопланетянин',  need:300000000,   world:'alien',      time:270},
+  {id:9, shape:'boss',      color:'#a02020', name:'Босс Ксеносов',  need:1500000000,  world:'boss',       time:300},
+  {id:10, shape:'posthuman',color:'#c88bff', name:'Постчеловек',    need:Infinity,    world:'divine',     time:0},
+];
+
+function renderCreature(shapeId, color) {
+  switch (shapeId) {
+    case 'dna':       return svgDNA();
+    case 'bacteria':  return svgBacteria(color);
+    case 'amoeba':    return svgAmoeba(color);
+    case 'fish':      return svgFish(color);
+    case 'lizard':    return svgLizard(color);
+    case 'ape':       return svgApe(color);
+    case 'human':     return svgHuman(color);
+    case 'cyborg':    return svgCyborg();
+    case 'alien':     return svgAlien();
+    case 'boss':      return svgBossAlien();
+    case 'posthuman': return svgPosthuman();
+    default:          return svgDNA();
+  }
+}
+
+const MUTATIONS = [
+  {id:'fast',   emoji:'⚡', name:'Быстрый метаболизм', desc:'+1 к силе клика',  base:20,    mult:1.15, effect:1,   maxLevel:50},
+  {id:'arm',    emoji:'💪', name:'Сильные лапы',       desc:'+5 к силе клика',  base:250,   mult:1.18, effect:5,   maxLevel:40},
+  {id:'brain',  emoji:'🧠', name:'Развитый мозг',      desc:'+25 к силе клика', base:3000,  mult:1.20, effect:25,  maxLevel:30},
+  {id:'quantum',emoji:'⚛️', name:'Квантовый разум',    desc:'+200 к силе клика',base:50000, mult:1.22, effect:200, maxLevel:20},
+];
+
+const GENERATORS = [
+  {id:'mitosis', emoji:'🔬', name:'Деление',      desc:'+0.5 🧬/сек',  base:60,       mult:1.15, cps:0.5,  maxLevel:50},
+  {id:'bacteria',emoji:'🦠', name:'Колония',       desc:'+5 🧬/сек',    base:900,      mult:1.15, cps:5,    maxLevel:40},
+  {id:'cells',   emoji:'🧫', name:'Клетки',       desc:'+50 🧬/сек',   base:15000,    mult:1.16, cps:50,   maxLevel:30},
+  {id:'organ',   emoji:'❤️', name:'Орган',        desc:'+500 🧬/сек',  base:250000,   mult:1.17, cps:500,  maxLevel:25},
+  {id:'brain2',  emoji:'🧠', name:'Нейросеть',    desc:'+5000 🧬/сек', base:4000000,  mult:1.18, cps:5000, maxLevel:20},
+];
+
+const CRYSTAL_SHOP = [
+  {id:'perm_click',   emoji:'👆', name:'Вечная сила',       desc:'+50% к силе клика навсегда',   baseCost:10, maxLevel:10, effect:'clickMult',  value:0.5},
+  {id:'perm_auto',    emoji:'⚡', name:'Вечный поток',      desc:'+50% к автодоходу навсегда',   baseCost:10, maxLevel:10, effect:'autoMult',   value:0.5},
+  {id:'perm_time',    emoji:'⏱️', name:'Доп. время',        desc:'+15 секунд к таймеру',         baseCost:15, maxLevel:10, effect:'extraTime',  value:15},
+  {id:'perm_offline', emoji:'🌙', name:'Оффлайн-доход',     desc:'+10% дохода пока тебя нет',    baseCost:25, maxLevel:5,  effect:'offline',    value:0.1},
+  {id:'perm_keep',    emoji:'🔮', name:'Память эволюций',   desc:'Сохранить мутацию после эволюции', baseCost:40, maxLevel:5,  effect:'keepMut',    value:1},
+  {id:'perm_start',   emoji:'🚀', name:'Быстрый старт',     desc:'+100 ДНК на старте',           baseCost:20, maxLevel:20, effect:'startDna',   value:100},
+];
+
+const EVENTS = [
+  {id:'meteor',   emoji:'☄️', text:'Метеорит!',         good:false, action:() => { const loss = Math.floor(S.dna * 0.2); S.dna = Math.max(0, S.dna - loss); return `-${fmt(loss)} ДНК`; }},
+  {id:'blessing', emoji:'🌟', text:'Благословение!',    good:true,  action:() => { S.blessingUntil = Date.now() + 15000; return 'x2 клик 15 сек'; }},
+  {id:'treasure', emoji:'🎁', text:'Клад!',             good:true,  action:() => { const gain = Math.max(200, cps()*60); S.dna += gain; S.totalDna += gain; return `+${fmt(gain)} ДНК`; }},
+  {id:'mutation', emoji:'🦠', text:'Мутация!',          good:true,  action:() => { S.evolutionBonus = 0.5; return 'Скидка 50%'; }},
+  {id:'ice',      emoji:'🧊', text:'Ледниковый период', good:false, action:() => { S.frozenUntil = Date.now() + 10000; return 'Генераторы -50%'; }},
+  {id:'luck',     emoji:'🍀', text:'Удача!',            good:true,  action:() => { S.timeLeft += 30; return '+30 сек'; }},
+];
+
+const SAVE_KEY = 'evolution_save_v3';
+
+let S = {
+  dna: 0, crystals: 0, totalDna: 0, stage: 0,
+  mut: {}, gen: {}, crystalShop: {}, collection: {},
+  clickMultiplier: 1, lastOnline: Date.now(),
+  timeLeft: 60, evolutionBonus: 0,
+  blessingUntil: 0, frozenUntil: 0,
+  combo: 0, lastClickTime: 0, currentWorld: 'water',
+  adsWatched: 0,
+  lastAdStage: 0,
+};
+
+function initState() {
+  MUTATIONS.forEach(m => { if (typeof S.mut[m.id] !== 'number') S.mut[m.id] = 0; });
+  GENERATORS.forEach(g => { if (typeof S.gen[g.id] !== 'number') S.gen[g.id] = 0; });
+  CRYSTAL_SHOP.forEach(i => { if (typeof S.crystalShop[i.id] !== 'number') S.crystalShop[i.id] = 0; });
+  if (!S.lastOnline) S.lastOnline = Date.now();
+  if (typeof S.timeLeft !== 'number') S.timeLeft = getStage().time;
+  if (typeof S.combo !== 'number') S.combo = 0;
+  if (typeof S.adsWatched !== 'number') S.adsWatched = 0;
+  if (typeof S.lastAdStage !== 'number') S.lastAdStage = 0;
+}
+
+function loadSave() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (raw) Object.assign(S, JSON.parse(raw));
+  } catch(e) {}
+  initState();
+}
+function writeSave() {
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch(e) {}
+}
+function resetGameState() {
+  S = {
+    dna: 0, crystals: 0, totalDna: 0, stage: 0,
+    mut: {}, gen: {}, crystalShop: {}, collection: {},
+    clickMultiplier: 1, lastOnline: Date.now(),
+    timeLeft: 60, evolutionBonus: 0,
+    blessingUntil: 0, frozenUntil: 0,
+    combo: 0, lastClickTime: 0, currentWorld: 'water',
+    adsWatched: 0, lastAdStage: 0,
+  };
+  MUTATIONS.forEach(m => S.mut[m.id] = 0);
+  GENERATORS.forEach(g => S.gen[g.id] = 0);
+  CRYSTAL_SHOP.forEach(item => S.crystalShop[item.id] = 0);
+}
+
+function fmt(n) {
+  if (n < 1000) return Math.floor(n).toString();
+  const units = ['','K','M','B','T','Qa','Qi'];
+  const i = Math.min(Math.floor(Math.log10(n)/3), units.length-1);
+  const v = n / Math.pow(1000, i);
+  return v.toFixed(v < 10 ? 2 : v < 100 ? 1 : 0) + units[i];
+}
+
+function permClickMult() { let m = 1; CRYSTAL_SHOP.forEach(i => { if (i.effect === 'clickMult') m += (S.crystalShop[i.id]||0) * i.value; }); return m; }
+function permAutoMult()  { let m = 1; CRYSTAL_SHOP.forEach(i => { if (i.effect === 'autoMult') m += (S.crystalShop[i.id]||0) * i.value; }); return m; }
+function permStartDna()  { let d = 0; CRYSTAL_SHOP.forEach(i => { if (i.effect === 'startDna') d += (S.crystalShop[i.id]||0) * i.value; }); return d; }
+function permKeepMut()   { let n = 0; CRYSTAL_SHOP.forEach(i => { if (i.effect === 'keepMut') n += (S.crystalShop[i.id]||0) * i.value; }); return Math.min(n, MUTATIONS.length); }
+function permExtraTime() { let t = 0; CRYSTAL_SHOP.forEach(i => { if (i.effect === 'extraTime') t += (S.crystalShop[i.id]||0) * i.value; }); return t; }
+
+function clickPower() {
+  let base = 1;
+  MUTATIONS.forEach(m => base += (S.mut[m.id] || 0) * m.effect);
+  let mult = S.clickMultiplier * permClickMult();
+  if (S.combo >= 50) mult *= 5;
+  else if (S.combo >= 20) mult *= 3;
+  else if (S.combo >= 10) mult *= 2;
+  if (Date.now() < S.blessingUntil) mult *= 2;
+  return base * mult;
+}
+function cps() {
+  let base = 0;
+  GENERATORS.forEach(g => base += (S.gen[g.id] || 0) * g.cps);
+  let mult = S.clickMultiplier * permAutoMult();
+  if (Date.now() < S.frozenUntil) mult *= 0.5;
+  return base * mult;
+}
+function mutationCost(m) { return Math.floor(m.base * Math.pow(m.mult, S.mut[m.id] || 0)); }
+function generatorCost(g) { return Math.floor(g.base * Math.pow(g.mult, S.gen[g.id] || 0)); }
+function getStage() { return STAGES[Math.min(S.stage, STAGES.length-1)]; }
+function nextStage() { return STAGES[Math.min(S.stage+1, STAGES.length-1)]; }
+
+function evolutionProgress() {
+  const next = nextStage();
+  if (next.need === Infinity) return 100;
+  let need = next.need;
+  if (S.evolutionBonus > 0) need *= (1 - S.evolutionBonus);
+  return Math.min(100, (S.totalDna / need) * 100);
+}
+function creatureScale() { return 0.7 + (evolutionProgress() / 100) * 0.6; }
+
+function checkForcedAd() {
+  const stagesSinceAd = S.stage - S.lastAdStage;
+  if (stagesSinceAd >= 3 && S.stage > 0) {
+    adv.showRewardedVideo({
+      callbacks: {
+        onClose: () => {
+          S.lastAdStage = S.stage;
+          writeSave();
+        }
+      }
+    });
+  }
+}
+
+function buyMutation(id) {
+  const m = MUTATIONS.find(x => x.id === id); if (!m) return;
+  const lvl = S.mut[id] || 0;
+  if (lvl >= m.maxLevel) { toast('✅ Максимум', 'green'); return; }
+  const cost = mutationCost(m);
+  if (S.dna < cost) { toast('❌ Нужно ' + fmt(cost) + ' ДНК', 'red'); return; }
+  S.dna -= cost;
+  S.mut[m.id] = lvl + 1;
+  toast('✅ ' + m.name + ' ур. ' + S.mut[m.id] + '/' + m.maxLevel, 'green');
+  updateStats(); updateListStates(); writeSave();
+}
+function buyGenerator(id) {
+  const g = GENERATORS.find(x => x.id === id); if (!g) return;
+  const lvl = S.gen[id] || 0;
+  if (lvl >= g.maxLevel) { toast('✅ Максимум', 'green'); return; }
+  const cost = generatorCost(g);
+  if (S.dna < cost) { toast('❌ Нужно ' + fmt(cost) + ' ДНК', 'red'); return; }
+  S.dna -= cost;
+  S.gen[g.id] = lvl + 1;
+  toast('✅ ' + g.name + ' ур. ' + S.gen[g.id] + '/' + g.maxLevel, 'green');
+  updateStats(); updateListStates(); writeSave();
+}
+function buyCrystalBonus(id) {
+  const item = CRYSTAL_SHOP.find(x => x.id === id); if (!item) return;
+  const lvl = S.crystalShop[item.id] || 0;
+  if (lvl >= item.maxLevel) { toast('✅ Максимум', 'green'); return; }
+  const cost = item.baseCost * (lvl + 1);
+  if (S.crystals < cost) { toast('💎 Нужно ' + cost + ' кристаллов', 'red'); return; }
+  S.crystals -= cost;
+  S.crystalShop[item.id] = lvl + 1;
+  toast('✅ ' + item.name + ' ур. ' + (lvl + 1), 'green');
+  updateStats(); updateListStates(); writeSave();
+}
+
+function watchAd() {
+  adv.showRewardedVideo({
+    callbacks: {
+      onRewarded: () => {
+        S.timeLeft += 30;
+        S.crystals += 3;
+        S.adsWatched++;
+        toast('📺 +30 сек и +3 💎', 'gold');
+        updateStats(); updateEvolutionBar(); writeSave();
+      }
+    }
+  });
+}
+
+function askEvolve() {
+  const next = nextStage();
+  if (next.need === Infinity) { toast('🏆 Финальная стадия!', 'gold'); return; }
+  let need = next.need;
+  if (S.evolutionBonus > 0) need *= (1 - S.evolutionBonus);
+  if (S.totalDna < need) { toast('Нужно ' + fmt(need) + ' ДНК', 'red'); return; }
+  S.stage++;
+  S.totalDna = 0;
+  S.evolutionBonus = 0;
+  S.collection[S.stage] = (S.collection[S.stage] || 0) + 1;
+  S.timeLeft = next.time || 0;
+  const startBonus = permStartDna();
+  S.dna = startBonus;
+  if (startBonus > 0) S.totalDna += startBonus;
+  const keepCount = permKeepMut();
+  const mutsSorted = MUTATIONS.map(m => ({ id: m.id, lvl: S.mut[m.id] || 0 }))
+    .sort((a, b) => b.lvl - a.lvl).slice(0, keepCount);
+  MUTATIONS.forEach(m => S.mut[m.id] = 0);
+  GENERATORS.forEach(g => S.gen[g.id] = 0);
+  mutsSorted.forEach(({ id, lvl }) => { if (lvl > 0) S.mut[id] = lvl; });
+  S.clickMultiplier = 1 + S.stage * 0.5;
+
+  const world = WORLDS[next.world];
+  let msg = 'Ты стал: ' + next.name + '\nМир: ' + world.emoji + ' ' + world.name + '\nМножитель x' + (1 + S.stage * 0.5).toFixed(1);
+  if (startBonus > 0) msg += '\n\n🚀 Старт: +' + fmt(startBonus) + ' ДНК';
+  const kept = mutsSorted.filter(m => m.lvl > 0).length;
+  if (kept > 0) msg += '\n🔮 Сохранено мутаций: ' + kept;
+  showModal(next.shape, next.color, '🌍 Новая стадия!', msg);
+  const mainEl = document.querySelector('.main-creature');
+  if (mainEl) mainEl.dataset.stage = '-1';
+  updateStats(); updateEvolutionBar(); renderList(); applyWorld(next.world); writeSave();
+
+  checkForcedAd();
+}
+
+function doClick(clientX, clientY) {
+  const now = Date.now();
+  if (now - S.lastClickTime < 800) S.combo++;
+  else S.combo = 1;
+  S.lastClickTime = now;
+  const gain = clickPower();
+  S.dna += gain;
+  S.totalDna += gain;
+  const zone = document.getElementById('evolutionZone');
+  const rect = zone.getBoundingClientRect();
+  spawnFlash(clientX - rect.left, clientY - rect.top, gain);
+  spawnClickBubble(clientX - rect.left, clientY - rect.top);
+  if (Math.random() < 0.05) {
+    spawnBigBonus(clientX - rect.left, clientY - rect.top);
+    if (Math.random() < 0.5) { S.blessingUntil = Date.now() + 10000; toast('🌟 x2 клик 10 сек!', 'gold'); }
+    else { S.timeLeft += 15; toast('⏱ +15 секунд!', 'gold'); }
+  }
+  if (navigator.vibrate) navigator.vibrate(6);
+  updateStats(); updateEvolutionBar(); updateCombo();
+  scheduleSave();
+}
+
+function spawnFlash(x, y, gain) {
+  const zone = document.getElementById('evolutionZone');
+  const el = document.createElement('div');
+  el.className = 'flash';
+  el.textContent = '+' + fmt(gain);
+  el.style.left = x + 'px'; el.style.top = y + 'px';
+  zone.appendChild(el);
+  setTimeout(() => el.remove(), 800);
+}
+function spawnClickBubble(x, y) {
+  const zone = document.getElementById('evolutionZone');
+  const el = document.createElement('div');
+  el.className = 'click-bubble';
+  el.style.left = x + 'px'; el.style.top = y + 'px';
+  zone.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+function spawnBigBonus(x, y) {
+  const zone = document.getElementById('evolutionZone');
+  const el = document.createElement('div');
+  el.className = 'big-bonus';
+  el.textContent = '✨ БОНУС!';
+  el.style.left = x + 'px'; el.style.top = y + 'px';
+  zone.appendChild(el);
+  setTimeout(() => el.remove(), 1200);
+}
+function updateCombo() {
+  const el = document.getElementById('comboInd');
+  if (S.combo >= 10) {
+    let mult = 2;
+    if (S.combo >= 50) mult = 5;
+    else if (S.combo >= 20) mult = 3;
+    el.textContent = `🔥 x${mult} КОМБО (${S.combo})`;
+    el.classList.add('active');
+  } else el.classList.remove('active');
+}
+
+let currentTab = 'mutations';
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === tab);
+  });
+  renderList();
+}
+
+function renderList() {
+  const list = document.getElementById('list');
+  let html = '';
+  if (currentTab === 'shop') {
+    html = CRYSTAL_SHOP.map(item => {
+      const lvl = S.crystalShop[item.id] || 0;
+      const maxed = lvl >= item.maxLevel;
+      const cost = item.baseCost * (lvl + 1);
+      const canBuy = !maxed && S.crystals >= cost;
+      const cls = maxed ? 'maxed' : (canBuy ? '' : 'locked');
+      return `<div class="item ${cls}" data-buy="crystal:${item.id}">
+        <div class="emoji">${item.emoji}</div>
+        <div class="info">
+          <div class="name">${item.name}</div>
+          <div class="desc">${item.desc}</div>
+          <div class="lvl" data-lvl>Ур. ${lvl} / ${item.maxLevel}</div>
+        </div>
+        <div class="cost">
+          <div class="price" data-cost>${maxed ? '✅ МАКС' : cost + ' 💎'}</div>
+          <div class="have" data-have>${maxed ? '' : (canBuy ? '✓ КУПИТЬ' : '🔒')}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } else if (currentTab === 'collection') {
+    html = STAGES.map((st, i) => {
+      const unlocked = i <= S.stage || (S.collection[i] || 0) > 0;
+      const world = WORLDS[st.world];
+      return `<div class="item ${unlocked ? '' : 'locked'}">
+        <div class="emoji">${unlocked ? world.emoji : '🔒'}</div>
+        <div class="info">
+          <div class="name">${st.name}</div>
+          <div class="desc">${unlocked ? world.emoji + ' ' + world.name : 'Не открыто'}</div>
+        </div>
+        <div class="cost"><div class="price">Ур. ${i}</div></div>
+      </div>`;
+    }).join('');
+  } else {
+    const data = currentTab === 'mutations' ? MUTATIONS : GENERATORS;
+    const stateObj = currentTab === 'mutations' ? S.mut : S.gen;
+    const costFn = currentTab === 'mutations' ? mutationCost : generatorCost;
+    const prefix = currentTab === 'mutations' ? 'mut' : 'gen';
+    html = data.map(item => {
+      const lvl = stateObj[item.id] || 0;
+      const maxed = lvl >= item.maxLevel;
+      const cost = costFn(item);
+      const canBuy = !maxed && S.dna >= cost;
+      const cls = maxed ? 'maxed' : (canBuy ? '' : 'locked');
+      return `<div class="item ${cls}" data-buy="${prefix}:${item.id}">
+        <div class="emoji">${item.emoji}</div>
+        <div class="info">
+          <div class="name">${item.name}</div>
+          <div class="desc">${item.desc}</div>
+          <div class="lvl" data-lvl>Ур. ${lvl} / ${item.maxLevel}</div>
+        </div>
+        <div class="cost">
+          <div class="price" data-cost>${maxed ? '✅ МАКС' : fmt(cost) + ' 🧬'}</div>
+          <div class="have" data-have>${maxed ? '⭐ МАКС' : (canBuy ? '✓ КУПИТЬ' : '🔒')}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  list.innerHTML = html;
+}
+
+function updateListStates() {
+  const list = document.getElementById('list');
+  const items = list.querySelectorAll('.item[data-buy]');
+  items.forEach(el => {
+    const [type, id] = el.dataset.buy.split(':');
+    let cost, canBuy, lvlText = '', maxed = false;
+    if (type === 'mut') {
+      const m = MUTATIONS.find(x => x.id === id); if (!m) return;
+      const lvl = S.mut[id] || 0;
+      maxed = lvl >= m.maxLevel;
+      cost = mutationCost(m);
+      canBuy = !maxed && S.dna >= cost;
+      lvlText = 'Ур. ' + lvl + ' / ' + m.maxLevel;
+    } else if (type === 'gen') {
+      const g = GENERATORS.find(x => x.id === id); if (!g) return;
+      const lvl = S.gen[id] || 0;
+      maxed = lvl >= g.maxLevel;
+      cost = generatorCost(g);
+      canBuy = !maxed && S.dna >= cost;
+      lvlText = 'Ур. ' + lvl + ' / ' + g.maxLevel;
+    } else if (type === 'crystal') {
+      const item = CRYSTAL_SHOP.find(x => x.id === id); if (!item) return;
+      const lvl = S.crystalShop[id] || 0;
+      maxed = lvl >= item.maxLevel;
+      cost = item.baseCost * (lvl + 1);
+      canBuy = !maxed && S.crystals >= cost;
+      lvlText = 'Ур. ' + lvl + ' / ' + item.maxLevel;
+    }
+    el.classList.toggle('maxed', maxed);
+    el.classList.toggle('locked', !maxed && !canBuy);
+    const costEl = el.querySelector('[data-cost]');
+    if (costEl) costEl.textContent = maxed ? '✅ МАКС' : (type === 'crystal' ? cost + ' 💎' : fmt(cost) + ' 🧬');
+    const haveEl = el.querySelector('[data-have]');
+    if (haveEl) haveEl.textContent = maxed ? '⭐ МАКС' : (canBuy ? '✓ КУПИТЬ' : '🔒');
+    const lvlEl = el.querySelector('[data-lvl]');
+    if (lvlEl && lvlText) lvlEl.textContent = lvlText;
+  });
+}
+
+function updateStats() {
+  const cur = getStage();
+  document.getElementById('dnaVal').textContent = fmt(S.dna);
+  document.getElementById('crystalsVal').textContent = S.crystals;
+  document.getElementById('levelVal').textContent = (S.stage + 1);
+  let mainEl = document.querySelector('.main-creature');
+  if (!mainEl) {
+    mainEl = document.createElement('div');
+    mainEl.className = 'main-creature';
+    mainEl.dataset.stage = '-1';
+    document.getElementById('evolutionZone').appendChild(mainEl);
+  }
+  if (mainEl.dataset.stage !== String(S.stage)) {
+    mainEl.dataset.stage = S.stage;
+    mainEl.innerHTML = renderCreature(cur.shape, cur.color);
+  }
+  const scale = creatureScale();
+  const baseSize = window.innerWidth < 400 ? 150 : 200;
+  mainEl.style.width = (baseSize * scale) + 'px';
+  mainEl.style.height = (baseSize * scale) + 'px';
+  document.getElementById('creatureName').textContent = WORLDS[cur.world].emoji + ' ' + cur.name;
+  const next = nextStage();
+  const canEvolve = next.need !== Infinity && evolutionProgress() >= 100;
+  const btn = document.getElementById('evolveBtn');
+  btn.disabled = !canEvolve;
+  btn.classList.toggle('ready', canEvolve);
+  document.getElementById('evoInfo').textContent = canEvolve ? '→ ' + next.name : '';
+  updateListStates();
+}
+
+function updateEvolutionBar() {
+  const cur = getStage();
+  const next = nextStage();
+  const progress = evolutionProgress();
+  document.getElementById('evoFill').style.width = progress + '%';
+  document.getElementById('stageLabel').textContent = WORLDS[cur.world].emoji + ' ' + cur.name;
+  document.getElementById('nextLabel').textContent = next.need === Infinity ? '🏆 ФИНАЛ' : '→ ' + next.name;
+  let needInStage = next.need === Infinity ? 0 : next.need;
+  if (S.evolutionBonus > 0) needInStage *= (1 - S.evolutionBonus);
+  document.getElementById('evoText').textContent =
+    next.need === Infinity ? '🏆 ' + fmt(S.totalDna) : fmt(Math.min(S.totalDna, needInStage)) + ' / ' + fmt(needInStage);
+  const timerEl = document.getElementById('timerLabel');
+  if (next.need === Infinity) timerEl.textContent = '';
+  else if (S.timeLeft <= 0) { timerEl.textContent = '💀 Время'; timerEl.style.color = '#ff3b3b'; }
+  else { timerEl.textContent = '⏱ ' + Math.ceil(S.timeLeft) + 'с'; timerEl.style.color = S.timeLeft <= 15 ? '#ff3b3b' : '#ff6b6b'; }
+}
+
+function showModal(shape, color, title, desc) {
+  document.getElementById('mEmoji').innerHTML = '<div style="width:100px;height:100px;margin:0 auto">' + renderCreature(shape, color) + '</div>';
+  document.getElementById('mTitle').textContent = title;
+  document.getElementById('mDesc').textContent = desc;
+  document.getElementById('modal').classList.add('show');
+}
+
+let toastTimer = null;
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + (type || '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+function startGame() {
+  document.getElementById('menu').classList.add('hidden');
+  document.getElementById('menu').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  applyWorld(getStage().world);
+  updateStats(); updateEvolutionBar(); renderList();
+  toast('🌊 Тапай по существу!');
+}
+
+function resetProgress() {
+  if (!confirm('Сбросить прогресс? Это необратимо.')) return;
+  resetGameState();
+  writeSave();
+  updateStats(); updateEvolutionBar(); renderList();
+  toast('🗑 Прогресс сброшен', 'red');
+}
+
+/* ============================================================
+   МИРЫ
+============================================================ */
+let currentWorldKey = '';
+function applyWorld(worldKey) {
+  if (currentWorldKey === worldKey) return;
+  currentWorldKey = worldKey;
+  S.currentWorld = worldKey;
+  const bg = document.getElementById('worldBg');
+  bg.className = 'world-bg ' + worldKey;
+  bg.innerHTML = '';
+
+  if (worldKey === 'water' || worldKey === 'air') {
+    for (let i = 0; i < 3; i++) {
+      const ray = document.createElement('div');
+      ray.className = 'ray';
+      bg.appendChild(ray);
+    }
+  }
+  if (worldKey === 'earth') {
+    const farShore = document.createElement('div');
+    farShore.style.cssText = 'position:absolute;top:38%;left:0;right:0;height:5%;background:linear-gradient(180deg,rgba(90,140,80,.7) 0%,rgba(60,100,50,.5) 100%);filter:blur(3px)';
+    bg.appendChild(farShore);
+    const beach = document.createElement('div');
+    beach.style.cssText = 'position:absolute;bottom:0;left:0;right:0;height:52%;background:linear-gradient(180deg,#fff8ec 0%,#fde8c8 20%,#f5d5a8 50%,#e0bd85 80%,#c9a06a 100%)';
+    bg.appendChild(beach);
+    for (let p = 0; p < 3; p++) {
+      const palm = document.createElement('div');
+      const size = p === 0 ? 1 : (p === 1 ? 0.75 : 0.6);
+      const posRight = p === 0 ? '8%' : (p === 1 ? '22%' : '');
+      const posLeft = p === 2 ? '6%' : '';
+      const flip = p === 2 ? 'scaleX(-1) ' : '';
+      palm.style.cssText = `position:absolute;bottom:${p === 0 ? '5%' : (p === 1 ? '8%' : '10%')};right:${posRight};left:${posLeft};width:${200 * size}px;height:${280 * size}px;transform:${flip}scale(${size});transform-origin:bottom center;z-index:${p === 0 ? 3 : 1};pointer-events:none`;
+      palm.innerHTML = `<svg viewBox="0 0 200 280" style="width:100%;height:100%;filter:drop-shadow(4px 6px 8px rgba(0,0,0,.35))">
+        <defs><linearGradient id="trunkGrad${p}" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#6a4a2a"/><stop offset="30%" stop-color="#a88868"/><stop offset="50%" stop-color="#c8a888"/><stop offset="70%" stop-color="#a88868"/><stop offset="100%" stop-color="#5a3a1a"/></linearGradient></defs>
+        <path d="M 95 280 Q 92 200 100 140 Q 108 90 105 40" stroke="url(#trunkGrad${p})" stroke-width="16" fill="none" stroke-linecap="round"/>
+        <g transform="translate(105,40)">
+          <path d="M 0 0 Q -80 -30 -95 -80 Q -70 -60 -50 -70 Q -60 -50 -40 -55 Q -45 -30 -20 -40 Q -25 -15 0 0 Z" fill="#6aa840" stroke="#2a5010" stroke-width="1"/>
+          <path d="M 0 0 Q -30 -60 -70 -95 Q -50 -70 -30 -75 Q -35 -45 -15 -45 Q -15 -20 0 0 Z" fill="#7ab540" stroke="#2a5010" stroke-width="1"/>
+          <path d="M 0 0 Q 30 -60 70 -95 Q 50 -70 30 -75 Q 35 -45 15 -45 Q 15 -20 0 0 Z" fill="#7ab540" stroke="#2a5010" stroke-width="1"/>
+          <path d="M 0 0 Q 80 -30 95 -80 Q 70 -60 50 -70 Q 60 -50 40 -55 Q 45 -30 20 -40 Q 25 -15 0 0 Z" fill="#6aa840" stroke="#2a5010" stroke-width="1"/>
+          <circle cx="-8" cy="-8" r="10" fill="#4a2a10"/>
+          <circle cx="8" cy="-6" r="9" fill="#3a1a05"/>
+          <circle cx="0" cy="-14" r="8" fill="#5a3a15"/>
+        </g>
+      </svg>`;
+      bg.appendChild(palm);
+    }
+  }
+  if (worldKey === 'city') {
+    const buildings = document.createElement('div'); buildings.className = 'city-buildings'; bg.appendChild(buildings);
+    const windows = document.createElement('div'); windows.className = 'city-windows'; bg.appendChild(windows);
+    const road = document.createElement('div'); road.className = 'city-road'; bg.appendChild(road);
+    for (let i = 1; i <= 3; i++) { const lamp = document.createElement('div'); lamp.className = 'lamp l' + i; bg.appendChild(lamp); }
+  }
+
+  /* ЛУНА И КОСМОС — фон для киборга */
+  if (worldKey === 'moonCosmos') {
+    // Звёзды
+    const stars = document.createElement('div');
+    stars.className = 'stars';
+    bg.appendChild(stars);
+
+    // Луна большая
+    const moon = document.createElement('div');
+    moon.className = 'moon-big';
+    bg.appendChild(moon);
+
+    // Кратеры на луне
+    const craterPositions = [
+      {top:'22%', right:'14%', w:'14px', h:'14px'},
+      {top:'15%', right:'8%', w:'8px', h:'8px'},
+      {top:'28%', right:'6%', w:'10px', h:'10px'},
+      {top:'18%', right:'20%', w:'6px', h:'6px'},
+      {top:'30%', right:'16%', w:'8px', h:'8px'},
+    ];
+    craterPositions.forEach(c => {
+      const crater = document.createElement('div');
+      crater.className = 'moon-craters';
+      crater.style.top = c.top;
+      crater.style.right = c.right;
+      crater.style.width = c.w;
+      crater.style.height = c.h;
+      bg.appendChild(crater);
+    });
+
+    // Туманность
+    const nebula = document.createElement('div');
+    nebula.className = 'nebula';
+    bg.appendChild(nebula);
+
+    // Маленькая планета
+    const planet = document.createElement('div');
+    planet.className = 'planet-small';
+    bg.appendChild(planet);
+
+    const ring = document.createElement('div');
+    ring.className = 'planet-ring';
+    bg.appendChild(ring);
+  }
+
+  /* ПЛАНЕТА КСЕН */
+  if (worldKey === 'alien') {
+    const mist = document.createElement('div');
+    mist.className = 'alien-mist';
+    bg.appendChild(mist);
+
+    const mushrooms = document.createElement('div');
+    mushrooms.className = 'alien-mushrooms';
+    bg.appendChild(mushrooms);
+
+    const planet = document.createElement('div');
+    planet.className = 'alien-planet';
+    bg.appendChild(planet);
+  }
+
+  /* ТЁМНАЯ ЗОНА */
+  if (worldKey === 'boss') {
+    const stars = document.createElement('div');
+    stars.className = 'boss-stars';
+    bg.appendChild(stars);
+
+    const ship = document.createElement('div');
+    ship.className = 'boss-ship';
+    bg.appendChild(ship);
+  }
+
+  if (worldKey === 'water') {
+    for (let i = 0; i < 20; i++) {
+      const b = document.createElement('div');
+      b.className = 'bubble';
+      const size = 6 + Math.random() * 20;
+      b.style.width = size + 'px'; b.style.height = size + 'px';
+      b.style.left = Math.random() * 100 + '%';
+      b.style.animationDuration = (8 + Math.random() * 12) + 's';
+      b.style.animationDelay = (-Math.random() * 20) + 's';
+      bg.appendChild(b);
+    }
+  }
+
+  const particles = WORLDS[worldKey].particles;
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = particles[Math.floor(Math.random() * particles.length)];
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (10 + Math.random() * 15) + 's';
+    p.style.animationDelay = (-Math.random() * 20) + 's';
+    p.style.fontSize = (12 + Math.random() * 14) + 'px';
+    bg.appendChild(p);
+  }
+}
+
+function triggerRandomEvent() {
+  const ev = EVENTS[Math.floor(Math.random() * EVENTS.length)];
+  const result = ev.action();
+  const toastEl = document.getElementById('eventToast');
+  toastEl.textContent = ev.emoji + ' ' + ev.text + ' ' + result;
+  toastEl.style.borderColor = ev.good ? '#00ff88' : '#ff3b3b';
+  toastEl.style.color = ev.good ? '#00ff88' : '#ff3b3b';
+  toastEl.classList.add('show');
+  setTimeout(() => toastEl.classList.remove('show'), 2500);
+  updateStats(); updateEvolutionBar();
+}
+
+function tickTimer() {
+  const next = nextStage();
+  if (next.need === Infinity) return;
+  if (S.timeLeft > 0) {
+    S.timeLeft -= 1;
+    if (S.timeLeft <= 0) {
+      S.timeLeft = 0;
+      const lost = Math.floor(S.totalDna * 0.3);
+      S.totalDna = Math.max(0, S.totalDna - lost);
+      S.dna = Math.max(0, S.dna - lost);
+      S.timeLeft = getStage().time + permExtraTime();
+      toast('💀 Время вышло! -' + fmt(lost) + ' ДНК', 'red');
+    }
+    updateEvolutionBar();
+  }
+}
+
+document.addEventListener('click', (e) => {
+  const actionEl = e.target.closest('[data-action]');
+  if (actionEl) {
+    const action = actionEl.dataset.action;
+    if (action === 'buy-mutation') buyMutation(actionEl.dataset.id);
+    else if (action === 'buy-generator') buyGenerator(actionEl.dataset.id);
+    else if (action === 'watch-ad') watchAd();
+    else if (action === 'evolve') askEvolve();
+    else if (action === 'start') startGame();
+    else if (action === 'reset') resetProgress();
+    else if (action === 'close-modal') document.getElementById('modal').classList.remove('show');
+    return;
+  }
+  const buyEl = e.target.closest('[data-buy]');
+  if (buyEl && !buyEl.classList.contains('locked') && !buyEl.classList.contains('maxed')) {
+    const [type, id] = buyEl.dataset.buy.split(':');
+    if (type === 'mut') buyMutation(id);
+    else if (type === 'gen') buyGenerator(id);
+    else if (type === 'crystal') buyCrystalBonus(id);
+    return;
+  }
+  const tabEl = e.target.closest('.tab');
+  if (tabEl) { switchTab(tabEl.dataset.tab); return; }
+});
+
+document.getElementById('evolutionZone').addEventListener('click', (e) => {
+  if (e.target.closest('[data-action]') || e.target.closest('[data-buy]')) return;
+  doClick(e.clientX, e.clientY);
+});
+document.getElementById('evolutionZone').addEventListener('touchstart', (e) => {
+  if (e.target.closest('[data-action]') || e.target.closest('[data-buy]')) return;
+  e.preventDefault();
+  const t = e.touches[0];
+  doClick(t.clientX, t.clientY);
+}, {passive: false});
+
+let saveTimeout = null;
+function scheduleSave() {
+  if (saveTimeout) return;
+  saveTimeout = setTimeout(() => {
+    saveTimeout = null;
+    writeSave();
+  }, 2000);
+}
+
+setInterval(() => {
+  const income = cps() / 10;
+  if (income > 0) {
+    S.dna += income;
+    S.totalDna += income;
+    updateStats(); updateEvolutionBar();
+  }
+}, 100);
+setInterval(tickTimer, 1000);
+setInterval(triggerRandomEvent, 25000);
+setInterval(writeSave, 5000);
+setInterval(() => { S.lastOnline = Date.now(); }, 10000);
+
+window.addEventListener('beforeunload', () => {
+  S.lastOnline = Date.now();
+  writeSave();
+});
+
+window.addEventListener('resize', updateStats);
+
+loadSave();
+updateStats();
+updateEvolutionBar();
+renderList();
+applyWorld(getStage().world);
+</script>
+</body>
+</html>
